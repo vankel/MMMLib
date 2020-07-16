@@ -488,7 +488,7 @@ public class MMM_TextureManager {
 				f = true;
 			}
 		}
-		return lreturn.packegeName;
+		return lreturn == null ? null : lreturn.packegeName;
 	}
 
 	public static String getPrevPackege(String nowname, int index) {
@@ -504,7 +504,7 @@ public class MMM_TextureManager {
 				lreturn = ltb;
 			}
 		}
-		return lreturn.packegeName;
+		return lreturn == null ? null  :lreturn.packegeName;
 	}
 
 	public static String getTextureName(String name, int index) {

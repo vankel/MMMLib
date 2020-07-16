@@ -8,7 +8,7 @@ import org.lwjgl.opengl.GL11;
  * アーマーの二重描画用クラス。
  */
 public class MMM_ModelArmors extends ModelBase {
-	
+
 	public RenderLiving renderLiving;
 	public ModelBase modelArmorOuter;
 	public ModelBase modelArmorInner;
