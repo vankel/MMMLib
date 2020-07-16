@@ -15,6 +15,13 @@
 ## 使い方
 - 要Modloader。
 - %appdata%/.mincraft/mods/にZIPのまま放りこんで下さい。
+- %appdata%/.mincraft/config/mod_MMM_MMMLib.cfgができるので設定はそちらで。
+
+
+## 設定
+- renderHackingはItemRendererの置き換えを指定します。  
+  他MOD使用時にどうしても表示がおかしくなる場合はfalseにしてください。  
+  但し、拙作のMODの一部で正しく表示が行われなくなります。
 
 
 ## 注意
@@ -24,6 +31,7 @@
 
 
 ## 変更点
+- 20121217.1 1.4.5 Rev4 修正
 - 20121204.1 1.4.5 Rev3 修正
     - Forge環境下で動かなかったのを修正。
 - 20121202.1 1.4.5 Rev2 機能追加

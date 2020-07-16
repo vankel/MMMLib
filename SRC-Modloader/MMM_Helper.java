@@ -106,13 +106,12 @@ public class MMM_Helper {
 	}
 	
 	public static void setShort(byte[] pData, int pIndex, int pVal) {
-    	pData[pIndex++]	= (byte)(pVal & 0xff);
-    	pData[pIndex]	= (byte)((pVal >>> 8) & 0xff);
+		pData[pIndex++]	= (byte)(pVal & 0xff);
+		pData[pIndex]	= (byte)((pVal >>> 8) & 0xff);
 	}
 	
 	public static short getShort(byte[] pData, int pIndex) {
 		return (short)((pData[pIndex] & 0xff) | ((pData[pIndex + 1] & 0xff) << 8));
 	}
 
-	
 }

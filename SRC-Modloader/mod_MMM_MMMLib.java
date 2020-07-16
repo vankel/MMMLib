@@ -12,6 +12,8 @@ public class mod_MMM_MMMLib extends BaseMod {
 	public static boolean isDebugView = false;
 	@MLProp()
 	public static boolean isDebugMessage = true;
+	@MLProp(info = "Override RenderItem.")
+	public static boolean renderHacking = true;
 	
 	
 	public static void Debug(String pText) {
@@ -28,7 +30,7 @@ public class mod_MMM_MMMLib extends BaseMod {
 
 	@Override
 	public String getVersion() {
-		return "1.4.5-3";
+		return "1.4.5-4";
 	}
 	
 	@Override
@@ -44,8 +46,8 @@ public class mod_MMM_MMMLib extends BaseMod {
 		MMM_FileManager.init();
 		MMM_TextureManager.init();
 		MMM_StabilizerManager.init();
+		ModLoader.setInGameHook(this, true, true);
 		if (isDebugView) {
-			ModLoader.setInGameHook(this, true, true);
 			MMM_EntityDummy.isEnable = true;
 		}
 	}
@@ -58,27 +60,35 @@ public class mod_MMM_MMMLib extends BaseMod {
 		MMM_TextureManager.loadTextures();
 		MMM_StabilizerManager.loadStabilizer();
 	}
-	
+
 	@Override
 	public void addRenderer(Map var1) {
-    	if (isDebugView) {
-    		var1.put(net.minecraft.src.MMM_EntityDummy.class, new MMM_RenderDummy());
-    	}
-    	//RenderItem
-    	var1.put(EntityItem.class, new MMM_RenderItem());
+		if (isDebugView) {
+			var1.put(net.minecraft.src.MMM_EntityDummy.class, new MMM_RenderDummy());
+		}
+		//RenderItem
+		var1.put(EntityItem.class, new MMM_RenderItem());
 	}
 
 	@Override
 	public boolean onTickInGame(float var1, Minecraft var2) {
-		// ダミーマーカーの表示用処理
-		try {
-			for (Iterator<MMM_EntityDummy> li = MMM_EntityDummy.appendList.iterator(); li.hasNext();) {
-				var2.theWorld.spawnEntityInWorld(li.next());
-				li.remove();
+		if (isDebugView) {
+			// ダミーマーカーの表示用処理
+			try {
+				for (Iterator<MMM_EntityDummy> li = MMM_EntityDummy.appendList.iterator(); li.hasNext();) {
+					var2.theWorld.spawnEntityInWorld(li.next());
+					li.remove();
+				}
+			} catch (Exception e) {
+//				e.printStackTrace();
 			}
-		} catch (Exception e) {
-//			e.printStackTrace();
 		}
+		
+		// アイテムレンダーをオーバーライド
+		if (renderHacking && MMM_Helper.isClient) {
+			MMM_Client.setItemRenderer();
+		}
+		
 		return true;
 	}
 	

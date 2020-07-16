@@ -23,28 +23,28 @@ public class MMM_StabilizerManager extends MMM_ManagerBase {
 	public static void loadStabilizer() {
 		(new MMM_StabilizerManager()).load();
 	}
-	
+
 	@Override
 	protected String getPreFix() {
 		return preFix;
 	}
-	
+
 	@Override
 	protected boolean append(Class pclass) {
-        if (!(MMM_ModelStabilizerBase.class).isAssignableFrom(pclass)) {
-            return false;
-        }
-        
+		if (!(MMM_ModelStabilizerBase.class).isAssignableFrom(pclass)) {
+			return false;
+		}
+		
 		try {
-	        MMM_ModelStabilizerBase lms = (MMM_ModelStabilizerBase)pclass.newInstance();
-	        stabilizerList.put(lms.getName(), lms);
-	        return true;
+			MMM_ModelStabilizerBase lms = (MMM_ModelStabilizerBase)pclass.newInstance();
+			stabilizerList.put(lms.getName(), lms);
+			return true;
 		} catch (Exception e) {
 		}
-
+		
 		return false;
 	}
-	
+
 	/**
 	 * 指定された名称のスタビライザーモデルを返す。
 	 */
@@ -60,7 +60,7 @@ public class MMM_StabilizerManager extends MMM_ManagerBase {
 		
 		return lequip;
 	}
-	
+
 	/**
 	 * 実装場所のアップデート
 	 */
@@ -69,5 +69,5 @@ public class MMM_StabilizerManager extends MMM_ManagerBase {
 			le.getValue().updateEquippedPoint(pModel);
 		}
 	}
-	
+
 }
