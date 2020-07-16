@@ -60,11 +60,6 @@ public class MMM_Helper {
 		}
 	}
 
-	@Deprecated
-	public static boolean isForge() {
-		return isForge;
-	}
-
 	/**
 	 * Forge用クラス獲得。
 	 */
@@ -72,6 +67,13 @@ public class MMM_Helper {
 		if (isForge) {
 			pName = pName.concat("_Forge");
 		}
+		return getNameOfClass(pName);
+	}
+
+	/**
+	 * 名前からクラスを獲得する
+	 */
+	public static Class getNameOfClass(String pName) {
 		if (fpackage != null) {
 			pName = fpackage.getName() + "." + pName;
 		}
@@ -80,10 +82,10 @@ public class MMM_Helper {
 			lclass = Class.forName(pName);
 		} catch (Exception e) {
 		}
-
+		
 		return lclass;
 	}
-	
+
 	/**
 	 * 送信用データのセット
 	 */
@@ -113,5 +115,45 @@ public class MMM_Helper {
 	public static short getShort(byte[] pData, int pIndex) {
 		return (short)((pData[pIndex] & 0xff) | ((pData[pIndex + 1] & 0xff) << 8));
 	}
+
+	protected static boolean canBlockBeSeen(Entity pEntity, int x, int y, int z, boolean toTop, boolean do1, boolean do2) {
+		// ブロックの可視判定
+		Vec3 vec3d = Vec3.createVectorHelper(pEntity.posX, pEntity.posY + pEntity.getEyeHeight(), pEntity.posZ);
+		Vec3 vec3d1 = Vec3.createVectorHelper((double)x + 0.5D, (double)y + (toTop ? 0.9D : 0.5D), (double)z + 0.5D);
+		
+		MovingObjectPosition movingobjectposition = pEntity.worldObj.rayTraceBlocks_do_do(vec3d, vec3d1, do1, do2);
+		if (movingobjectposition == null) {
+			return false;
+		}
+		if (movingobjectposition.typeOfHit == EnumMovingObjectType.TILE) {
+			if (movingobjectposition.blockX == MathHelper.floor_double(vec3d1.xCoord) && 
+				movingobjectposition.blockY == MathHelper.floor_double(vec3d1.yCoord) &&
+				movingobjectposition.blockZ == MathHelper.floor_double(vec3d1.zCoord)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean setPathToTile(EntityLiving pEntity, TileEntity pTarget, boolean flag) {
+		// Tileまでのパスを作る
+		PathNavigate lpn = pEntity.getNavigator();
+		float lspeed = 0.3F;
+		// 向きに合わせて距離を調整
+		int i = (pTarget.yCoord == MathHelper.floor_double(pEntity.posY) && flag) ? 2 : 1;
+		switch (pEntity.worldObj.getBlockMetadata(pTarget.xCoord, pTarget.yCoord, pTarget.zCoord)) {
+		case 3:
+			return lpn.tryMoveToXYZ(pTarget.xCoord, pTarget.yCoord, pTarget.zCoord + i, lspeed);
+		case 2:
+			return lpn.tryMoveToXYZ(pTarget.xCoord, pTarget.yCoord, pTarget.zCoord - i, lspeed);
+		case 5:
+			return lpn.tryMoveToXYZ(pTarget.xCoord + 1, pTarget.yCoord, pTarget.zCoord, lspeed);
+		case 4:
+			return lpn.tryMoveToXYZ(pTarget.xCoord - i, pTarget.yCoord, pTarget.zCoord, lspeed);
+		default:
+			return lpn.tryMoveToXYZ(pTarget.xCoord, pTarget.yCoord, pTarget.zCoord, lspeed);
+		}
+	}
+
 
 }

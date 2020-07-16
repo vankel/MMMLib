@@ -45,7 +45,7 @@ public abstract class MMM_ModelStabilizerBase extends ModelBase {
 	public void init(MMM_EquippedStabilizer pequipped) {
 		// •Ï”‚È‚Ç‚ğ’è‹`‚·‚é
 	}
-	
+/*	
 	@Deprecated
 	@Override
 	public void render(Entity par1Entity, float par2, float par3, float par4, float par5, float par6, float par7) {

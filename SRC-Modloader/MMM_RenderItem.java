@@ -23,15 +23,16 @@ public class MMM_RenderItem extends RenderItem {
         float f2 = MathHelper.sin(((float)entityitem.age + f1) / 10F + entityitem.hoverStart) * 0.1F + 0.1F;
         float f3 = (((float)entityitem.age + f1) / 20F + entityitem.hoverStart) * 57.29578F;
         byte byte0 = 1;
-        if(entityitem.item.stackSize > 1)
+        ItemStack lis = entityitem.func_92059_d();
+        if(lis.stackSize > 1)
         {
             byte0 = 2;
         }
-        if(entityitem.item.stackSize > 5)
+        if(lis.stackSize > 5)
         {
             byte0 = 3;
         }
-        if(entityitem.item.stackSize > 20)
+        if(lis.stackSize > 20)
         {
             byte0 = 4;
         }
@@ -51,7 +52,7 @@ public class MMM_RenderItem extends RenderItem {
             }
 
             try {
-				lflag = (Boolean)pMethod.invoke(entityitem.item.getItem(), 0, entityitem.item, entityitem);
+				lflag = (Boolean)pMethod.invoke(lis.getItem(), 0, lis, entityitem);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
