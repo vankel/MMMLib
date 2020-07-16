@@ -1,5 +1,6 @@
 package net.minecraft.src;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +45,7 @@ public abstract class MMM_GuiMobSelect extends GuiScreen {
 		if (!pForce && !entityMap.isEmpty()) return;
 		
 		for (Map.Entry<Class, String> le : entityMapClass.entrySet()) {
+			if (Modifier.isAbstract(le.getKey().getModifiers())) continue;
 			int li = 0;
 			Entity lentity = null;
 			try {
@@ -69,7 +71,7 @@ public abstract class MMM_GuiMobSelect extends GuiScreen {
 	@Override
 	public void initGui() {
 		selectPanel = new MMM_GuiSlotMobSelect(mc, this);
-		selectPanel.registerScrollButtons(controlList, 3, 4);
+		selectPanel.registerScrollButtons(buttonList, 3, 4);
 	}
 
 	@Override
@@ -83,13 +85,7 @@ public abstract class MMM_GuiMobSelect extends GuiScreen {
 	/**
 	 *  スロットがクリックされた
 	 */
-	public void clickSlot(int pIndex, boolean pDoubleClick, String pName, EntityLiving pEntity) {
-		if (pDoubleClick) {
-			clickSlot(pIndex);
-		}
-	}
-	@Deprecated
-	public void clickSlot(int pIndex) {};
+	public abstract void clickSlot(int pIndex, boolean pDoubleClick, String pName, EntityLiving pEntity);
 
 	/**
 	 *  スロットの描画

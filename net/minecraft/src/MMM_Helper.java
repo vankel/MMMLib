@@ -56,21 +56,9 @@ public class MMM_Helper {
 	}
 	
 	/**
-	 * Forge用追加テクスチャの設定
-	 */
-	public static void setForgeIcon(Object pobject) {
-		if (isForge && isClient) {
-			try {
-				pobject.getClass().getMethod("setTextureFile", String.class).invoke(pobject, "/gui/mmmforge.png");
-			} catch (Exception e) {
-			}
-		}
-	}
-
-	/**
 	 * Forge用クラス獲得。
 	 */
-	public static Class getEntityClass(BaseMod pMod, String pName) {
+	public static Class getForgeClass(BaseMod pMod, String pName) {
 		if (isForge) {
 			pName = pName.concat("_Forge");
 		}
@@ -188,17 +176,23 @@ public class MMM_Helper {
 
 	/**
 	 * Modloader環境下で空いているEntityIDを返す。
+	 * 有効な値を獲得できなければ-1を返す。
 	 */
-	public static int getNextEntityID() {
-		try {
-			Map<Integer, Class> lmap = (Map<Integer, Class>)ModLoader.getPrivateValue(EntityList.class, null, 2);
-			List<Integer> llist = new ArrayList<Integer>(lmap.keySet());
+	public static int getNextEntityID(boolean isLiving) {
+		if (isLiving) {
+			// 生物用
 			for (int li = 1; li < 256; li++) {
-				if (!llist.contains(li)) {
+				if (EntityList.getClassFromID(li) == null) {
 					return li;
 				}
 			}
-		} catch (Exception e) {
+		} else {
+			// 物用
+			for (int li = mod_MMM_MMMLib.startVehicleEntityID; li < mod_MMM_MMMLib.startVehicleEntityID + 2048; li++) {
+				if (EntityList.getClassFromID(li) == null) {
+					return li;
+				}
+			}
 		}
 		return -1;
 	}
