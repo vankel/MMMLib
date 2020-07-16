@@ -13,9 +13,6 @@ public class mod_MMM_MMMLib extends BaseMod {
 	@MLProp()
 	public static boolean isDebugMessage = true;
 	
-	public static boolean isForge = ModLoader.isModLoaded("Forge");
-	public static Minecraft minecraft;
-	
 	
 	public static void Debug(String pText) {
 		// デバッグメッセージ
@@ -31,23 +28,20 @@ public class mod_MMM_MMMLib extends BaseMod {
 
 	@Override
 	public String getVersion() {
-		return "1.4.5-1";
+		return "1.4.5-2";
 	}
 	
 	@Override
 	public String getPriorities() {
-		return isForge ? "befor-all" : "before:*";
+		return MMM_Helper.isForge ? "befor-all" : "before:*";
 	}
 
 	@Override
 	public void load() {
 		// 初期化
-		try {
-			minecraft = ModLoader.getMinecraftInstance();
-		} catch (Error e) {
-//			MinecraftServer mcs = ModLoader.getMinecraftServerInstance();
-		}
-		MMM_FileManager.init(minecraft);
+		Debug(MMM_Helper.isClient ? "Client" : "Server");
+		Debug(MMM_Helper.isForge ? "Forge" : "Modloader");
+		MMM_FileManager.init();
 		MMM_TextureManager.init();
 		MMM_StabilizerManager.init();
 		if (isDebugView) {
@@ -59,7 +53,7 @@ public class mod_MMM_MMMLib extends BaseMod {
 	@Override
 	public void modsLoaded() {
 		// ロード
-		if (minecraft == null) return;
+		if (!MMM_Helper.isClient) return;
 		
 		MMM_TextureManager.loadTextures();
 		MMM_StabilizerManager.loadStabilizer();

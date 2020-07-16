@@ -94,7 +94,7 @@ public class MMM_EntityDummy extends Entity {
     		mod_MMM_MMMLib.Debug("L");
     	}
     	
-    	WorldClient lworld = mod_MMM_MMMLib.minecraft.theWorld;
+    	WorldClient lworld = MMM_Helper.mc.theWorld;
     	MMM_EntityDummy ed = new MMM_EntityDummy(lworld, color, owner);
     	ed.setPosition(posx, posy, posz);
     	appendList.add(ed);
