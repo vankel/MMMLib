@@ -17,6 +17,11 @@ import java.util.jar.JarFile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 
+/**
+ * modsディレクトリの獲得とminecraft本体のjarを獲得し、
+ * そこに含まれる指定された文字列を含むzipがあるかどうかを判定する。
+ *
+ */
 public class MMM_FileManager {
 
 	public static File minecraftJar;
@@ -71,16 +76,21 @@ public class MMM_FileManager {
 		
 	}
 
-
+	/**
+	 * MODディレクトリに含まれる対象ファイルのオブジェクトを取得。
+	 * @param pname 検索リスト名称、getFileList()で使う。
+	 * @param pprefix この文字列の含まれるファイルを列挙する。
+	 * @return 列挙されたファイルのリスト。
+	 */
 	public static List<File> getModFile(String pname, String pprefix) {
-		// MODディレクトリに含まれる対象ファイルのオブジェクトを取得
-		
 		// 検索済みかどうかの判定
+		List<File> llist;
 		if (fileList.containsKey(pname)) {
-			return fileList.get(pname);
+			llist = fileList.get(pname);
+		} else {
+			llist = new ArrayList<File>();
+			fileList.put(pname, llist);
 		}
-		List<File> llist = new ArrayList<File>();
-		fileList.put(pname, llist);
 		
 		// modsディレクトリの獲得
 		File lmod;
@@ -119,9 +129,14 @@ public class MMM_FileManager {
 		}
 	}
 
+	/**
+	 * 検索済みのリストに含まれる列挙ファイルを返す。
+	 * @param pname 検索リスト名。
+	 * @return 列挙されたファイルのリスト。
+	 */
 	public static List<File> getFileList(String pname) {
 		return fileList.get(pname);
 	}
-	
-	
+
+
 }

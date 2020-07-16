@@ -2,6 +2,9 @@ package net.minecraft.src;
 
 import java.io.ByteArrayInputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import net.minecraft.client.Minecraft;
 
@@ -174,5 +177,21 @@ public class MMM_Helper {
 		}
 	}
 
+	/**
+	 * ModloaderŠÂ‹«‰º‚Å‹ó‚¢‚Ä‚¢‚éEntityID‚ğ•Ô‚·B
+	 */
+	public static int getNextEntityID() {
+		try {
+			Map<Integer, Class> lmap = (Map<Integer, Class>)ModLoader.getPrivateValue(EntityList.class, null, 2);
+			List<Integer> llist = new ArrayList<Integer>(lmap.keySet());
+			for (int li = 1; li < 256; li++) {
+				if (!llist.contains(li)) {
+					return li;
+				}
+			}
+		} catch (Exception e) {
+		}
+		return -1;
+	}
 
 }
