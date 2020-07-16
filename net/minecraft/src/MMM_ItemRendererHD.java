@@ -22,10 +22,31 @@ public class MMM_ItemRendererHD extends ItemRendererHD implements MMM_IItemRende
 		mc = minecraft;
 	}
 
+	@Override
+	public Minecraft getMC() {
+		return mc;
+	}
+
+	@Override
+	public ItemStack getItemToRender() {
+		return itemToRender;
+	}
+
+	@Override
+	public float getEquippedProgress() {
+		return equippedProgress;
+	}
+
+	@Override
+	public float getPrevEquippedProgress() {
+		return prevEquippedProgress;
+	}
+
+	@Override
 	public void renderItem(EntityLiving entityliving, ItemStack itemstack, int i) {
 		Item litem = itemstack.getItem();
-		if (litem instanceof MMM_IItemRender) {
-			MMM_IItemRender lii = (MMM_IItemRender)litem;
+		if (MMM_ItemRenderManager.isEXRender(litem)) {
+			MMM_ItemRenderManager lii = MMM_ItemRenderManager.getEXRender(litem);
 			String ltex = lii.getRenderTexture();
 			if (ltex != null) {
 				this.mc.renderEngine.bindTexture(this.mc.renderEngine.getTexture(ltex));
@@ -74,6 +95,7 @@ public class MMM_ItemRendererHD extends ItemRendererHD implements MMM_IItemRende
 		super.renderItem(entityliving, itemstack, i);
 	}
 
+	@Override
 	public void renderItemInFirstPerson(float f) {
 		itemToRender = null;
 		equippedProgress = 0.0F;
@@ -89,8 +111,10 @@ public class MMM_ItemRendererHD extends ItemRendererHD implements MMM_IItemRende
 		
 		if (itemToRender != null) {
 			Item litem = itemToRender.getItem();
-			if (litem instanceof MMM_IItemRender) {
-				if (((MMM_IItemRender)litem).renderItemInFirstPerson(f)) {
+			if (MMM_ItemRenderManager.isEXRender(litem)) {
+				MMM_ItemRenderManager lim = MMM_ItemRenderManager.getEXRender(litem);
+				
+				if (MMM_ItemRenderManager.getEXRender(litem).renderItemInFirstPerson(f, this)) {
 					return;
 				}
 			}

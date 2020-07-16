@@ -16,18 +16,18 @@ public abstract class MMM_GuiMobSelect extends GuiScreen {
 	protected GuiSlot selectPanel;
 
 
-	
+
 	public MMM_GuiMobSelect(World pWorld) {
 		entityMap = new TreeMap<String, Entity>();
 		initEntitys(pWorld, true);
 	}
-	
+
 	public MMM_GuiMobSelect(World pWorld, Map<String, Entity> pMap) {
 		entityMap = pMap;
 		initEntitys(pWorld, false);
 	}
-	
-	
+
+
 	public void initEntitys(World world, boolean pForce) {
 		// 表示用EntityListの初期化
 		if (entityMapClass.isEmpty()) {
@@ -39,7 +39,7 @@ public abstract class MMM_GuiMobSelect extends GuiScreen {
 				mod_MMM_MMMLib.Debug("EntityClassMap copy failed.");
 			}
 		}
-
+		
 		if (entityMap == null) return;
 		if (!pForce && !entityMap.isEmpty()) return;
 		
@@ -83,7 +83,13 @@ public abstract class MMM_GuiMobSelect extends GuiScreen {
 	/**
 	 *  スロットがクリックされた
 	 */
-	public abstract void clickSlot(int pIndex);
+	public void clickSlot(int pIndex, boolean pDoubleClick, String pName, EntityLiving pEntity) {
+		if (pDoubleClick) {
+			clickSlot(pIndex);
+		}
+	}
+	@Deprecated
+	public void clickSlot(int pIndex) {};
 
 	/**
 	 *  スロットの描画

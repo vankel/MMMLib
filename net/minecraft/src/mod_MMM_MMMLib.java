@@ -30,6 +30,11 @@ public class mod_MMM_MMMLib extends BaseMod {
 			System.out.println(String.format("MMMLib-%s", pText));
 		}
 	}
+	public static void Debug(String pText, Object... pVals) {
+		if (isDebugMessage) {
+			System.out.println(String.format("MMMLib-" + pText, pVals));
+		}
+	}
 
 	@Override
 	public String getName() {
@@ -38,7 +43,7 @@ public class mod_MMM_MMMLib extends BaseMod {
 
 	@Override
 	public String getVersion() {
-		return "1.4.7-5";
+		return "1.4.7-6";
 	}
 	
 	@Override
@@ -70,6 +75,7 @@ public class mod_MMM_MMMLib extends BaseMod {
 			// テクスチャパックの構築
 			MMM_TextureManager.loadTextures();
 			MMM_StabilizerManager.loadStabilizer();
+			MMM_Client.setArmorPrefix();
 		} else {
 			MMM_TextureManager.loadTextureIndex();
 		}
