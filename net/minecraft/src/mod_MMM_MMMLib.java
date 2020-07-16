@@ -36,7 +36,7 @@ public class mod_MMM_MMMLib extends BaseMod {
 
 	@Override
 	public String getVersion() {
-		return "1.4.7-1";
+		return "1.4.7-2";
 	}
 	
 	@Override
@@ -111,53 +111,6 @@ public class mod_MMM_MMMLib extends BaseMod {
 	}
 
 	@Override
-	public void clientCustomPayload(NetClientHandler var1, Packet250CustomPayload var2) {
-		// クライアント側の特殊パケット受信動作
-		byte lmode = var2.data[0];
-		int leid = 0;
-		Entity lentity = null;
-		if ((lmode & 0x80) != 0) {
-			leid = MMM_Helper.getInt(var2.data, 1);
-			lentity = MMM_Helper.getEntity(var2.data, 1, MMM_Helper.mc.theWorld);
-			if (lentity == null) return;
-		}
-		Debug(String.format("MMM|Upd Clt Call[%2x:%d].", lmode, leid));
-		
-		switch (lmode) {
-		case MMM_Client_SetTextureIndex:
-			// テクスチャ名称のリクエストに対して番号を返す
-			/*
-			 * 0:id
-			 * 1:index
-			 * 2-5:TextureIndex
-			 */
-			int li7 = MMM_Helper.getShort(var2.data, 2);
-			String ls7 = MMM_TextureManager.getRequestString(var2.data[1]);
-			Debug(String.format("%d = %d : %s", li7, var2.data[1], ls7 == null ? "NULL" : ls7));
-			MMM_TextureManager.setStringToIndex(li7, ls7);
-			break;
-		case MMM_Client_SetTextureStr:
-			// テクスチャ名称のリクエストに対して番号を返す
-			/*
-			 * 0:id
-			 * 1-2:index 登録テクスチャ番号
-			 * 3-:Str 名称
-			 */
-			int li8 = MMM_Helper.getShort(var2.data, 1);
-			String ls8 = MMM_Helper.getStr(var2.data, 3);
-			Debug(String.format("%d = %s", li8, ls8 == null ? "NULL" : ls8));
-			MMM_TextureManager.setStringToIndex(li8, ls8);
-			break;
-			
-		}
-	}
-
-	public static void sendToServer(byte[] pData) {
-		ModLoader.clientSendPacket(new Packet250CustomPayload("MMM|Upd", pData));
-		Debug(String.format("MMM|Upd:%2x:NOEntity", pData[0]));
-	}
-
-	@Override
 	public void serverCustomPayload(NetServerHandler var1, Packet250CustomPayload var2) {
 		// サーバ側の動作
 		byte lmode = var2.data[0];
@@ -202,7 +155,7 @@ public class mod_MMM_MMMLib extends BaseMod {
 			 * 1-2:index 登録テクスチャ番号
 			 */
 			int li8 = MMM_Helper.getShort(var2.data, 1);
-			MMM_TextureBoxServer lb8 = MMM_TextureManager.getIndexToString(li8);
+			MMM_TextureBoxServer lb8 = MMM_TextureManager.getIndexToBox(li8);
 			Debug(String.format("%d : %s", li8, lb8.textureName == null ? "NULL" : lb8.textureName));
 			ldata = new byte[3 + lb8.textureName.getBytes().length];
 			ldata[0] = MMM_Client_SetTextureStr;
@@ -220,22 +173,22 @@ public class mod_MMM_MMMLib extends BaseMod {
 	}
 
 	@Override
+	public void clientCustomPayload(NetClientHandler var1, Packet250CustomPayload var2) {
+		MMM_Client.clientCustomPayload(var1, var2);
+	}
+
+	@Override
 	public void clientConnect(NetClientHandler var1) {
-		if (MMM_Helper.mc.isIntegratedServerRunning()) {
-//			Debug("Localmode: InitTextureList.");
-//			MMM_TextureManager.initTextureList(true);
-		} else {
-			Debug("Remortmode: ClearTextureList.");
-			MMM_TextureManager.initTextureList(false);
-		}
+		MMM_Client.clientConnect(var1);
 	}
 
 	@Override
 	public void clientDisconnect(NetClientHandler var1) {
-//		super.clientDisconnect(var1);
-		Debug("Localmode: InitTextureList.");
-		MMM_TextureManager.initTextureList(true);
+		if (MMM_Helper.isClient) {
+			MMM_Client.clientDisconnect(var1);
+		} else {
+			MMM_TextureManager.saveTextureIndex();
+		}
 	}
-	
 
 }

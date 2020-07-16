@@ -1,9 +1,11 @@
 package net.minecraft.src;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -25,6 +27,7 @@ import net.minecraft.server.MinecraftServer;
 public class MMM_TextureManager {
 
 //	private static String defDirName = "/mob/littleMaid/";
+	private static String nameTextureIndex = "config/mod_MMM_textureList.cfg";
 	/**
 	 * 旧タイプのファイル名
 	 */
@@ -199,7 +202,7 @@ public class MMM_TextureManager {
 
 	public static boolean loadTextureIndex() {
 		// サーバー用テクスチャ名称のインデクッスローダー
-		File lfile = MinecraftServer.getServer().getFile("config/textureList.cfg");
+		File lfile = MinecraftServer.getServer().getFile(nameTextureIndex);
 		if (lfile.exists() && lfile.isFile()) {
 			try {
 				FileReader fr = new FileReader(lfile);
@@ -242,6 +245,32 @@ public class MMM_TextureManager {
 		return false;
 	}
 
+	public static void saveTextureIndex() {
+		// サーバー用テクスチャ名称のインデクッスセーバー
+		File lfile = MinecraftServer.getServer().getFile(nameTextureIndex);
+		try {
+			FileWriter fw = new FileWriter(lfile);
+			BufferedWriter bw = new BufferedWriter(fw);
+			
+			for (MMM_TextureBoxServer lbox : textureServer.values()) {
+				bw.write(String.format(
+						"%04x,%04x,%f,%f,%f,%s",
+						lbox.contractColor,
+						lbox.wildColor,
+						lbox.modelHeight,
+						lbox.modelWidth,
+						lbox.modelYOffset,
+						lbox.textureName));
+				bw.newLine();
+			}
+			
+			bw.close();
+			fw.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * テクスチャインデックスを構築。
 	 */
@@ -254,12 +283,18 @@ public class MMM_TextureManager {
 				MMM_TextureBoxServer lbox = new MMM_TextureBoxServer();
 				lbox.contractColor	= lte.getContractColorBits();
 				lbox.wildColor		= lte.getWildColorBits();
-				lbox.modelHeight	= lte.models[0].getHeight();
-				lbox.modelWidth		= lte.models[0].getWidth();
-				lbox.modelYOffset	= lte.models[0].getyOffset();
+				if (lte.models != null && lte.models[0] != null) {
+					lbox.modelHeight	= lte.models[0].getHeight();
+					lbox.modelWidth		= lte.models[0].getWidth();
+					lbox.modelYOffset	= lte.models[0].getyOffset();
+				} else {
+					// TODO:これ一時的に０入れてるけど、なんかデフォルトのモデルを設定したほうが良いかしら？
+					lbox.modelHeight	= 0F;
+					lbox.modelWidth		= 0F;
+					lbox.modelYOffset	= 0F;
+				}
 				lbox.textureName	= lte.packegeName;
 				textureServer.put(li++, lbox);
-				li++;
 			}
 		}
 	}
@@ -632,7 +667,7 @@ public class MMM_TextureManager {
 	 * 契約のメイドの色をランダムで返す
 	 */
 	public static int getRandomContractColor(int pIndex, Random rand) {
-		MMM_TextureBox ltb = getTextureBox(getIndexToString(pIndex).textureName);
+		MMM_TextureBox ltb = getTextureBox(getIndexToString(pIndex));
 		if (ltb == null) return -1;
 		
 		List<Integer> llist = new ArrayList<Integer>();
@@ -658,7 +693,8 @@ public class MMM_TextureManager {
 	 */
 	public static int getStringToIndex(String pname) {
 		for (Entry<Integer, MMM_TextureBoxServer> le : textureServer.entrySet()) {
-			if (le.getValue().textureName.equals(pname)) {
+			// TODO:余計な処理込み
+			if (le.getValue().textureName != null && le.getValue().textureName.equals(pname)) {
 				return le.getKey();
 			}
 		}
@@ -679,7 +715,7 @@ public class MMM_TextureManager {
 				MMM_Helper.setInt(ldata, 10, Float.floatToIntBits(lbox.models[0].getWidth()));
 				MMM_Helper.setInt(ldata, 14, Float.floatToIntBits(lbox.models[0].getyOffset()));
 				MMM_Helper.setStr(ldata, 18, pname);
-				mod_MMM_MMMLib.sendToServer(ldata);
+				MMM_Client.sendToServer(ldata);
 				mod_MMM_MMMLib.Debug("GetTextureIndex");
 			}
 			return li;
@@ -711,16 +747,25 @@ public class MMM_TextureManager {
 		return li;
 	}
 
-	public static MMM_TextureBoxServer getIndexToString(int pIndex) {
+	public static String getIndexToString(int pIndex) {
+		MMM_TextureBoxServer lbox = getIndexToBox(pIndex);
+		return lbox == null ? null : lbox.textureName;
+	}
+	public static MMM_TextureBoxServer getIndexToBox(int pIndex) {
+		if (pIndex < 0) {
+			// マイナス値は有り得ない。
+			return null;
+		}
 		if (!textureServer.containsKey(pIndex)) {
 			if (MMM_Helper.isClient) {
 				// サーバー側へ番号に対応するテクスチャパックの名称を問い合わせ
 				// サーチかける時用のブランクを設置
+				// TODO:このへんおかしい
 				textureServer.put(pIndex, new MMM_TextureBoxServer());
 				byte[] ldata = new byte[3];
 				ldata[0] = mod_MMM_MMMLib.MMM_Server_GetTextureStr;
 				MMM_Helper.setShort(ldata, 1, pIndex);
-				mod_MMM_MMMLib.sendToServer(ldata);
+				MMM_Client.sendToServer(ldata);
 			} else {
 				// サーバー側にインデックスが無いということは有り得ないはず。
 			}
