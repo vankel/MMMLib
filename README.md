@@ -31,6 +31,13 @@
 
 
 ## 変更点
+- 20130611.1 1.5.2 Rev5 更新
+    - EntityLiving用のEntityCapsを追加。
+    - モデル選択GUIをこちらへ移動。
+    - IModelCapsにパラメーターを追加。
+    - テクスチャ管理対応用インターフェースITextureEntityを大幅改装。
+    - SlotArmor修正。
+    - TextureBoxのカラービット管理を修正。
 - 20130606.1 1.5.2 Rev4 更新
     - TextureManagerをインスタンスで扱うように変更。
     - マルチ用修正。
