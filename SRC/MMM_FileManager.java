@@ -35,15 +35,6 @@ public class MMM_FileManager {
 		// mincraft.jar‚ðŽæ“¾
 		// ŠJ”­’†—p‚ÌJar“à‚ÉŠÜ‚Ü‚ê‚Ä‚¢‚é‚±‚Æ‚Ì‘Îô
 		try {
-/*			
-			ClassLoader lcl1 = ModLoader.class.getClassLoader();
-			String lcls1 = ModLoader.class.getSimpleName().concat(".class");
-			lcl1.
-			URL lclu1 = lcl1.getResource(lcls1);
-			JarURLConnection lclc1 = (JarURLConnection)lclu1.openConnection();
-			JarFile lclj1 = lclc1.getJarFile();
-			mod_MMM_MMMLib.Debug(String.format("getMincraftFile-file:%s", lclj1.getName()));
-*/			
 			ProtectionDomain ls1 = BaseMod.class.getProtectionDomain();
 			CodeSource ls2 = ls1.getCodeSource();
 			URL ls3 = ls2.getLocation();
@@ -51,15 +42,31 @@ public class MMM_FileManager {
 			minecraftJar = new File(ls4);
 //			minecraftJar = new File(BaseMod.class.getProtectionDomain().getCodeSource().getLocation().toURI());
 //			mod_MMM_MMMLib.Debug(String.format("getMincraftFile-file:%s", minecraftJar.getName()));
-			mod_MMM_MMMLib.Debug(String.format("getMincraftFile-file:%s", minecraftJar.getAbsolutePath()));
+			mod_MMM_MMMLib.Debug(String.format("getMinecraftFile-file:%s", minecraftJar.getAbsolutePath()));
 		} catch (Exception exception) {
-			mod_MMM_MMMLib.Debug("getMincrafFile-Exception.");
+			mod_MMM_MMMLib.Debug("getMinecraftFile-Exception.");
+		}
+		if (minecraftJar == null) {
+			try {
+				ClassLoader lcl1 = BaseMod.class.getClassLoader();
+				String lcls1 = BaseMod.class.getName().concat(".class");
+				URL lclu1 = lcl1.getResource(lcls1);
+				JarURLConnection lclc1 = (JarURLConnection)lclu1.openConnection();
+				JarFile lclj1 = lclc1.getJarFile();
+				minecraftJar = new File(lclj1.getName());
+				mod_MMM_MMMLib.Debug(String.format("getMinecraftFile-file:%s", lclj1.getName()));
+			} catch (Exception exception) {
+				mod_MMM_MMMLib.Debug("getMinecraftFile-Exception.");
+			}
 		}
 		if (minecraftJar == null) {
 			String ls = System.getProperty("java.class.path");
-			ls = ls.substring(0, ls.indexOf(';'));
+			int li = ls.indexOf(';');
+			if (li > -1) {
+				ls = ls.substring(0, li);
+			}
 			minecraftJar = new File(ls);
-			mod_MMM_MMMLib.Debug(String.format("getMincraftFile-file:%s", ls));
+			mod_MMM_MMMLib.Debug(String.format("getMinecraftFile-file:%s", ls));
 		}
 		
 	}
