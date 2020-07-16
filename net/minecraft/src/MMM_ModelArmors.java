@@ -1,5 +1,6 @@
 package net.minecraft.src;
 
+import java.util.Map;
 import java.util.Random;
 
 import org.lwjgl.opengl.GL11;
@@ -7,11 +8,11 @@ import org.lwjgl.opengl.GL11;
 /**
  * アーマーの二重描画用クラス。
  */
-public class MMM_ModelArmors extends ModelBase {
+public class MMM_ModelArmors extends ModelBase implements MMM_IModelCaps {
 
 	public RenderLiving renderLiving;
-	public ModelBase modelArmorOuter;
-	public ModelBase modelArmorInner;
+	public MMM_ModelBiped modelArmorOuter;
+	public MMM_ModelBiped modelArmorInner;
 	/**
 	 * 部位毎のアーマーテクスチャの指定。
 	 * 外側。
@@ -28,12 +29,12 @@ public class MMM_ModelArmors extends ModelBase {
 	 */
 	public int renderParts;
 	public boolean isAlphablend;
+	public boolean isModelAlphablend;
 
 
 	public MMM_ModelArmors(RenderLiving pRender) {
 		renderLiving = pRender;
 		renderParts = 0;
-		isAlphablend = false;
 	}
 
 	@Override
@@ -42,12 +43,13 @@ public class MMM_ModelArmors extends ModelBase {
 			modelArmorOuter.setLivingAnimations(par1EntityLiving, par2, par3, par4);
 		}
 		modelArmorInner.setLivingAnimations(par1EntityLiving, par2, par3, par4);
+		isAlphablend = true;
 	}
 
 	@Override
 	public void render(Entity par1Entity, float par2, float par3, float par4, float par5, float par6, float par7) {
 		if (isAlphablend) {
-			if (mod_LMM_littleMaidMob.AlphaBlend) {
+			if (isModelAlphablend) {
 				GL11.glEnable(GL11.GL_BLEND);
 				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			} else {
@@ -62,6 +64,7 @@ public class MMM_ModelArmors extends ModelBase {
 			renderLiving.loadTexture(textureInner[renderParts]);
 		}
 		modelArmorInner.render(par1Entity, par2, par3, par4, par5, par6, par7);
+		isAlphablend = false;
 	}
 
 	@Override
@@ -81,6 +84,58 @@ public class MMM_ModelArmors extends ModelBase {
 			modelArmorOuter.setRotationAngles(par1, par2, par3, par4, par5, par6, par7Entity);
 		}
 		modelArmorInner.setRotationAngles(par1, par2, par3, par4, par5, par6, par7Entity);
+	}
+
+	public void showArmorParts(int pIndex) {
+		if (modelArmorOuter != null) {
+			modelArmorOuter.showArmorParts(pIndex);
+		}
+		modelArmorInner.showArmorParts(pIndex);
+	}
+
+	@Override
+	public Map<String, Integer> getModelCaps() {
+		return modelArmorInner.getModelCaps();
+	}
+
+	@Override
+	public Object getCapsValue(int pIndex) {
+		return modelArmorInner.getCapsValue(pIndex);
+	}
+	@Override
+	public Object getCapsValue(String pCapsName) {
+		return modelArmorInner.getCapsValue(pCapsName);
+	}
+	@Override
+	public int getCapsValueInt(int pIndex) {
+		return modelArmorInner.getCapsValueInt(pIndex);
+	}
+	@Override
+	public float getCapsValueFloat(int pIndex) {
+		return modelArmorInner.getCapsValueFloat(pIndex);
+	}
+	@Override
+	public double getCapsValueDouble(int pIndex) {
+		return modelArmorInner.getCapsValueDouble(pIndex);
+	}
+	@Override
+	public boolean getCapsValueBoolean(int pIndex) {
+		return modelArmorInner.getCapsValueBoolean(pIndex);
+	}
+
+	@Override
+	public boolean setCapsValue(int pIndex, Object... pArg) {
+		if (modelArmorOuter != null) {
+			modelArmorOuter.setCapsValue(pIndex, pArg);
+		}
+		return modelArmorInner.setCapsValue(pIndex, pArg);
+	}
+	@Override
+	public boolean setCapsValue(String pCapsName, Object... pArg) {
+		if (modelArmorOuter != null) {
+			modelArmorOuter.setCapsValue(pCapsName, pArg);
+		}
+		return modelArmorInner.setCapsValue(pCapsName, pArg);
 	}
 
 }
