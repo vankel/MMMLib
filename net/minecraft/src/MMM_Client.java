@@ -1,59 +1,27 @@
 package net.minecraft.src;
 
-import static net.minecraft.src.mod_MMM_MMMLib.*;
+import static net.minecraft.src.mod_MMM_MMMLib.Debug;
 
-import java.lang.reflect.Constructor;
+import java.util.Random;
 
-import net.minecraft.client.Minecraft;
+import org.lwjgl.opengl.GL11;
 
 public class MMM_Client {
 
-	public static Class itemRendererClass;
-	public static Constructor itemRendererConstructor;
-
-
-	public static void getItemRendererClass() {
-		itemRendererClass = MMM_ItemRenderer.class;
-		if (MMM_Helper.mc.entityRenderer.itemRenderer.getClass().getSimpleName().equals("ItemRendererHD")) {
-			try {
-				String ls = "MMM_ItemRendererHD";
-				if (MMM_Helper.fpackage != null) {
-					ls = MMM_Helper.fpackage.getName() + "." + ls;
-				}
-				Class lc = Class.forName(ls);
-				itemRendererClass = lc;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		try {
-			itemRendererConstructor = itemRendererClass.getConstructor(Minecraft.class);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	public static MMM_ItemRenderer itemRenderer;
 
 
 	public static void setItemRenderer() {
-		if (!(MMM_Helper.mc.entityRenderer.itemRenderer instanceof MMM_IItemRenderer)) {
-			mod_MMM_MMMLib.Debug("replace entityRenderer.itemRenderer.");
-			getItemRendererClass();
-			try {
-				Object lo = itemRendererConstructor.newInstance(MMM_Helper.mc);
-				MMM_Helper.mc.entityRenderer.itemRenderer = (ItemRenderer)lo;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		if (itemRenderer == null) {
+			itemRenderer = new MMM_ItemRenderer(MMM_Helper.mc);
 		}
-		if (!(RenderManager.instance.itemRenderer instanceof MMM_IItemRenderer)) {
+		if (!(MMM_Helper.mc.entityRenderer.itemRenderer instanceof MMM_ItemRenderer)) {
+			mod_MMM_MMMLib.Debug("replace entityRenderer.itemRenderer.");
+			MMM_Helper.mc.entityRenderer.itemRenderer = itemRenderer;
+		}
+		if (!(RenderManager.instance.itemRenderer instanceof MMM_ItemRenderer)) {
 			mod_MMM_MMMLib.Debug("replace RenderManager.itemRenderer.");
-			getItemRendererClass();
-			try {
-				Object lo = itemRendererConstructor.newInstance(MMM_Helper.mc);
-				RenderManager.instance.itemRenderer = (ItemRenderer)lo;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			RenderManager.instance.itemRenderer = itemRenderer;
 		}
 		// GUIの表示を変えるには常時監視が必要？
 	}
@@ -71,38 +39,21 @@ public class MMM_Client {
 		Debug("MMM|Upd Clt Call[%2x:%d].", lmode, leid);
 		
 		switch (lmode) {
-		case MMM_Client_SetTextureIndex:
-			// テクスチャ名称に対応するサーバー側と同じインデックスを設定する
-			/*
-			 * 0:id
-			 * 1:index
-			 * 2-5:TextureIndex
-			 */
-			int li7 = MMM_Helper.getShort(var2.data, 2);
-			String ls7 = MMM_TextureManager.getRequestString(var2.data[1]);
-			Debug("%d = %d : %s", li7, var2.data[1], ls7 == null ? "NULL" : ls7);
-			MMM_TextureManager.setStringToIndex(li7, ls7);
+		case MMM_Statics.Client_SetTextureIndex:
+			// 問い合わせたテクスチャパックの管理番号を受け取る
+			MMM_TextureManager.reciveFormServerSetTexturePackIndex(var2.data);
 			break;
-		case MMM_Client_SetTextureStr:
-			// インデックスに対応するテクスチャ名称を登録する、主にサーバー側のみに名称登録がある場合に使用。
-			/*
-			 * 0:id
-			 * 1-2:index 登録テクスチャ番号
-			 * 3-:Str 名称
-			 */
-			int li8 = MMM_Helper.getShort(var2.data, 1);
-			String ls8 = MMM_Helper.getStr(var2.data, 3);
-			Debug("%d = %s", li8, ls8 == null ? "NULL" : ls8);
-			MMM_TextureManager.setStringToIndex(li8, ls8);
+		case MMM_Statics.Client_SetTexturePackName:
+			// 管理番号に登録されているテクスチャパックの情報を受け取る
+			MMM_TextureManager.reciveFromServerSetTexturePackName(var2.data);
 			break;
-			
 		}
 	}
 
 	public static void clientConnect(NetClientHandler var1) {
 		if (MMM_Helper.mc.isIntegratedServerRunning()) {
-//			Debug("Localmode: InitTextureList.");
-//			MMM_TextureManager.initTextureList(true);
+			Debug("Localmode: InitTextureList.");
+			MMM_TextureManager.initTextureList(true);
 		} else {
 			Debug("Remortmode: ClearTextureList.");
 			MMM_TextureManager.initTextureList(false);
@@ -111,8 +62,8 @@ public class MMM_Client {
 
 	public static void clientDisconnect(NetClientHandler var1) {
 //		super.clientDisconnect(var1);
-		Debug("Localmode: InitTextureList.");
-		MMM_TextureManager.initTextureList(true);
+//		Debug("Localmode: InitTextureList.");
+//		MMM_TextureManager.initTextureList(true);
 	}
 
 	public static void sendToServer(byte[] pData) {
@@ -131,5 +82,53 @@ public class MMM_Client {
 		} catch (Exception e) {
 		}
 	}
+
+	/**
+	 * Duoを使う時は必ずRender側のこの関数を置き換えること。
+	 * @param par1EntityLiving
+	 * @param par2
+	 */
+	public static void renderArrowsStuckInEntity(EntityLiving par1EntityLiving, float par2,
+			Render pRender, MMM_ModelBase pModel) {
+		int lacount = par1EntityLiving.getArrowCountInEntity();
+		
+		if (lacount > 0) {
+			EntityArrow larrow = new EntityArrow(par1EntityLiving.worldObj, par1EntityLiving.posX, par1EntityLiving.posY, par1EntityLiving.posZ);
+			Random lrand = new Random((long)par1EntityLiving.entityId);
+			RenderHelper.disableStandardItemLighting();
+			
+			for (int var6 = 0; var6 < lacount; ++var6) {
+				GL11.glPushMatrix();
+				MMM_ModelRenderer var7 = pModel.getRandomModelBox(lrand);
+				MMM_ModelBoxBase var8 = var7.cubeList.get(lrand.nextInt(var7.cubeList.size()));
+				var7.postRender(0.0625F);
+				float var9 = lrand.nextFloat();
+				float var10 = lrand.nextFloat();
+				float var11 = lrand.nextFloat();
+				float var12 = (var8.posX1 + (var8.posX2 - var8.posX1) * var9) / 16.0F;
+				float var13 = (var8.posY1 + (var8.posY2 - var8.posY1) * var10) / 16.0F;
+				float var14 = (var8.posZ1 + (var8.posZ2 - var8.posZ1) * var11) / 16.0F;
+				GL11.glTranslatef(var12, var13, var14);
+				var9 = var9 * 2.0F - 1.0F;
+				var10 = var10 * 2.0F - 1.0F;
+				var11 = var11 * 2.0F - 1.0F;
+				var9 *= -1.0F;
+				var10 *= -1.0F;
+				var11 *= -1.0F;
+				float var15 = MathHelper.sqrt_float(var9 * var9 + var11 * var11);
+				larrow.prevRotationYaw = larrow.rotationYaw = (float)(Math.atan2((double)var9, (double)var11) * 180.0D / Math.PI);
+				larrow.prevRotationPitch = larrow.rotationPitch = (float)(Math.atan2((double)var10, (double)var15) * 180.0D / Math.PI);
+				double var16 = 0.0D;
+				double var18 = 0.0D;
+				double var20 = 0.0D;
+				float var22 = 0.0F;
+				pRender.renderManager.renderEntityWithPosYaw(larrow, var16, var18, var20, var22, par2);
+				GL11.glPopMatrix();
+			}
+			
+			RenderHelper.enableStandardItemLighting();
+		}
+	}
+
 
 }

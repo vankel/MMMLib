@@ -13,6 +13,8 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.DebugGraphics;
+
 import net.minecraft.client.Minecraft;
 
 public class MMM_Helper {
@@ -23,7 +25,10 @@ public class MMM_Helper {
 	public static final boolean isForge = ModLoader.isModLoaded("Forge");
 	public static final Minecraft mc;
 	public static Method methGetSmeltingResultForge = null;
+	public static Class entityRegistry = null;
+	public static Method registerModEntity = null;
 	protected static final Map<Class, Class>replaceEntitys = new HashMap<Class, Class>();
+	protected static Map<String, Integer> entityIDList = new HashMap<String, Integer>();
 	
 	static {
 		fpackage = ModLoader.class.getPackage();
@@ -43,11 +48,25 @@ public class MMM_Helper {
 			try {
 				methGetSmeltingResultForge = FurnaceRecipes.class.getMethod("getExperience", ItemStack.class);
 			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			try {
+				entityRegistry = getNameOfClass("cpw.mods.fml.common.registry.EntityRegistry");
+				registerModEntity = entityRegistry.getMethod("registerModEntity",
+						Class.class, String.class, int.class, Object.class, int.class, int.class, boolean.class);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
-		
 	}
-	
+
+	/**
+	 * 現在の実行環境がローカルかどうかを判定する。
+	 */
+	public static boolean isLocalPlay() {
+		return isClient && mc.isIntegratedServerRunning();
+	}
+
 	/**
 	 * マルチ対応用。
 	 * ItemStackに情報更新を行うと、サーバー側との差異からSlotのアップデートが行われる。
@@ -90,6 +109,7 @@ public class MMM_Helper {
 		try {
 			lclass = Class.forName(pName);
 		} catch (Exception e) {
+			mod_MMM_MMMLib.Debug("Class:%s is not found.", pName);
 		}
 		
 		return lclass;
@@ -192,7 +212,7 @@ public class MMM_Helper {
 	 * Modloader環境下で空いているEntityIDを返す。
 	 * 有効な値を獲得できなければ-1を返す。
 	 */
-	public static int getNextEntityID(boolean isLiving) {
+	private static int getNextEntityID(boolean isLiving) {
 		if (isLiving) {
 			// 生物用
 			for (int li = 1; li < 256; li++) {
@@ -212,6 +232,83 @@ public class MMM_Helper {
 	}
 
 	/**
+	 * Entityを登録する。
+	 * RML、Forge両対応。
+	 * @param entityclass
+	 * @param entityName
+	 * @param defaultId
+	 * 0 : オートアサイン
+	 * @param mod
+	 * @param uniqueModeName
+	 * @param trackingRange
+	 * @param updateFrequency
+	 * @param sendVelocityUpdate
+	 */
+	public static void registerEntity(
+			Class<? extends Entity> entityclass, String entityName, int defaultId,
+			BaseMod mod, int trackingRange, int updateFrequency, boolean sendVelocityUpdate,
+			int pEggColor1, int pEggColor2) {
+		int lid = 0;
+		lid = getModEntityID(mod.getName());
+		if (isForge) {
+			try {
+				Method lmethod;
+				// EntityIDの獲得
+				lmethod = entityRegistry.getMethod("findGlobalUniqueEntityId");
+				defaultId = (Integer)lmethod.invoke(null);
+				
+				if (pEggColor1 == 0 && pEggColor2 == 0) {
+					lmethod = entityRegistry.getMethod("registerGlobalEntityID",
+							Class.class, String.class, int.class);
+					lmethod.invoke(null, entityclass, entityName, defaultId);
+				} else {
+					lmethod = entityRegistry.getMethod("registerGlobalEntityID",
+							Class.class, String.class, int.class, int.class, int.class);
+					lmethod.invoke(null, entityclass, entityName, defaultId, pEggColor1, pEggColor2);
+				}
+				// EntityListへの登録は適当な数字でよい。
+//				defaultId = getNextEntityID(false);
+//				if (pEggColor1 == 0 && pEggColor2 == 0) {
+//					ModLoader.registerEntityID(entityclass, entityName, defaultId);
+//				} else {
+//					ModLoader.registerEntityID(entityclass, entityName, defaultId, pEggColor1, pEggColor2);
+//				}
+				registerModEntity.invoke(
+						null, entityclass, entityName, lid,
+						mod, trackingRange, updateFrequency, sendVelocityUpdate);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			// EntityListへの登録は
+			if (defaultId == 0) {
+				defaultId = getNextEntityID(entityclass.isAssignableFrom(EntityLiving.class));
+			}
+			if (pEggColor1 == 0 && pEggColor2 == 0) {
+				ModLoader.registerEntityID(entityclass, entityName, defaultId);
+			} else {
+				ModLoader.registerEntityID(entityclass, entityName, defaultId, pEggColor1, pEggColor2);
+			}
+			ModLoader.addEntityTracker(mod, entityclass, defaultId, trackingRange, updateFrequency, sendVelocityUpdate);
+		}
+		Debug("RegisterEntity ID:%d / %s-%d : %s", defaultId, mod.getName(), lid, entityName);
+	}
+	public static void registerEntity(
+			Class<? extends Entity> entityclass, String entityName, int defaultId,
+			BaseMod mod, int trackingRange, int updateFrequency, boolean sendVelocityUpdate) {
+		registerEntity(entityclass, entityName, defaultId, mod, trackingRange, updateFrequency, sendVelocityUpdate, 0, 0);
+	}
+
+	private static int getModEntityID(String uniqueModeName) {
+		int li = 0;
+		if (entityIDList.containsKey(uniqueModeName)) {
+			li = entityIDList.get(uniqueModeName);
+		}
+		entityIDList.put(uniqueModeName, li + 1);
+		return li;
+	}
+
+	/**
 	 * Entityを返す。
 	 */
 	public static Entity getEntity(byte[] pData, int pIndex, World pWorld) {
@@ -225,14 +322,16 @@ public class MMM_Helper {
 	 */
 	public static Entity getAvatarEntity(Entity pEntity){
 		// littleMaid用コードここから
+		if (pEntity == null) return null;
 		try {
 			// 射手の情報をEntityLittleMaidAvatarからEntityLittleMaidへ置き換える
 			Field field = pEntity.getClass().getField("avatar");
 			pEntity = (EntityLiving)field.get(pEntity);
-		}
-		catch (NoSuchFieldException e) {
-		}
-		catch (Exception e) {
+		} catch (NoSuchFieldException e) {
+		} catch (Exception e) {
+			e.printStackTrace();
+		} catch (Error e) {
+			e.printStackTrace();
 		}
 		// ここまで
 		return pEntity;
@@ -342,8 +441,8 @@ public class MMM_Helper {
 		try {
 			// stringToClassMapping
 			Map lmap;
-			int lint;
-			String ls;
+			int lint = 0;
+			String ls = "";
 			lmap = (Map)ModLoader.getPrivateValue(EntityList.class, null, 0);
 			for (Entry<String, Class> le : ((Map<String, Class>)lmap).entrySet()) {
 				if (le.getValue() == pSrcClass) {
@@ -372,7 +471,7 @@ public class MMM_Helper {
 				lmap.put(pDestClass, lint);
 			}
 			replaceEntitys.put(pSrcClass, pDestClass);
-			Debug("Replace %s -> %s", pSrcClass.getSimpleName(), pDestClass.getSimpleName());
+			Debug("Replace %s -> %s(EntityListID: %d, EntityListString: %s)", pSrcClass.getSimpleName(), pDestClass.getSimpleName(), lint, ls);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
