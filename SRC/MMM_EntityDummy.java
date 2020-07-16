@@ -15,7 +15,7 @@ public class MMM_EntityDummy extends Entity {
 	/**
 	 * —LŒø”»’è
 	 */
-	public static boolean isEnable = true;
+	public static boolean isEnable = false;
 	
 	public static List<MMM_EntityDummy> appendList = new ArrayList<MMM_EntityDummy>();
 

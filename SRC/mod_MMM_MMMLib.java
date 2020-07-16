@@ -30,7 +30,7 @@ public class mod_MMM_MMMLib extends BaseMod {
 
 	@Override
 	public String getVersion() {
-		return "1.3.2-2";
+		return "1.3.2-3";
 	}
 	
 	@Override
@@ -47,6 +47,7 @@ public class mod_MMM_MMMLib extends BaseMod {
 		MMM_StabilizerManager.init();
 		if (isDebugView) {
 			ModLoader.setInGameHook(this, true, true);
+			MMM_EntityDummy.isEnable = true;
 		}
 	}
 
@@ -68,14 +69,12 @@ public class mod_MMM_MMMLib extends BaseMod {
 
 	@Override
 	public boolean onTickInGame(float var1, Minecraft var2) {
-		
+		// ダミーマーカーの表示用処理
 		try {
-//			MMM_EntityDummy.appendList.wait(20);
 			for (Iterator<MMM_EntityDummy> li = MMM_EntityDummy.appendList.iterator(); li.hasNext();) {
 				var2.theWorld.spawnEntityInWorld(li.next());
 				li.remove();
 			}
-//			MMM_EntityDummy.appendList.notify();
 		} catch (Exception e) {
 //			e.printStackTrace();
 		}
