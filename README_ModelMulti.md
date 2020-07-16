@@ -18,11 +18,11 @@
 - パーツの親子関係
     - それぞれのパーツの親子関係は以下の通りになっています。
 ~~~~
-+- mainFrame
++- mainFrame@
 	|
-	+- bipedBody
+	+- bipedTorso@
 		|
-		+- bipedNeck
+		+- bipedNeck@
 		|	|
 		|	+- bipedHead
 		|	|	|
@@ -38,9 +38,53 @@
 		|		|
 		|		+- Arms[1]
 		|
-		+- Skirt
+		+- bipedBody
 		|
-		+- bipedRightLeg
+		+- bipedPelvic@
+			|
+			+- Skirt
+			|
+			+- bipedRightLeg
+			|
+			+- bipedLeftLeg
+~~~~
+
+
+## ModelSmartMovingBase(未実装)
+- パーツの親子関係
+    - それぞれのパーツの親子関係は以下の通りになっています。
+~~~~
++- bipedOuter@
+	|
+	+- bipedTorso@
 		|
-		+- bipedLeftLeg
+		+- bipedBreast@
+		|	|
+		|	+- bipedHead
+		|	|	|
+		|	|	+- bipedHeadwear
+		|	|	|
+		|	|	+- HeadTop
+		|	|	|
+		|	|	+- HeadMount
+		|	|
+		|	+- bipedRightShoulder@
+		|	|	|
+		|	|	+- bipedRightArm
+		|	|		|
+		|	|		+- Arms[0]
+		|	|
+		|	+- bipedLeftShoulder@
+		|		|
+		|		+- biprdLeftArm
+		|			|
+		|			+- Arms[1]
+		|
+		+- bipedBody
+		|
+		+- bipedPelvic@
+			|
+			+- bipedRightLeg
+			|
+			+- bipedLeftLeg
 ~~~~
