@@ -74,8 +74,9 @@ public class MMM_EntityDummy extends Entity {
 	 */
 	public static void clearDummyEntity(Entity entity) {
 		if (!isEnable) return;
+		if (!MMM_Helper.isClient) return;
 		
-		List<Entity> liste = entity.worldObj.getLoadedEntityList();
+		List<Entity> liste = entity.worldObj.loadedEntityList;
 		for (Entity entity1 : liste) {
 			if (entity1 instanceof MMM_EntityDummy) {
 				((MMM_EntityDummy)entity1).setOwnerdEntityDead(entity);
@@ -88,18 +89,16 @@ public class MMM_EntityDummy extends Entity {
 	 */
 	public static void setDummyEntity(Entity owner, int color, double posx, double posy, double posz) {
 		if (!isEnable) return;
+		if (!MMM_Helper.isClient) return;
 		
 		// サーバー側でしか呼ばれないっぽい
 		if (owner.worldObj.isRemote) {
 			mod_MMM_MMMLib.Debug("L");
 		}
 		
-		WorldClient lworld = MMM_Helper.mc.theWorld;
-		MMM_EntityDummy ed = new MMM_EntityDummy(lworld, color, owner);
+		MMM_EntityDummy ed = new MMM_EntityDummy(MMM_Client.getMCtheWorld(), color, owner);
 		ed.setPosition(posx, posy, posz);
 		appendList.add(ed);
-//    	lworld.spawnEntityInWorld(ed);
-		//joinEntityInSurroundings(ed);
 	}
 
 }

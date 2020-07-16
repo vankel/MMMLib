@@ -31,6 +31,11 @@
 
 
 ## 変更点
+- 20130606.1 1.5.2 Rev4 更新
+    - TextureManagerをインスタンスで扱うように変更。
+    - マルチ用修正。
+    - Entity乗っとり処理を微修正、一部を二重登録してnullEntityの生成を防ぐようにした。
+    - ModelMultiBaseのshowAllPartsを実装。
 - 20130531.1 1.5.2 Rev3 更新
     - ModelBase類の機能絞込み。
     - IModelCapsで取得できる値の追加。
