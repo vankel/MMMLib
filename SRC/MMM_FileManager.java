@@ -26,7 +26,12 @@ public class MMM_FileManager {
 		// mincraft.jar‚ğæ“¾
 		// ŠJ”­’†—p‚ÌJar“à‚ÉŠÜ‚Ü‚ê‚Ä‚¢‚é‚±‚Æ‚Ì‘Îô
 		try {
-			minecraftJar = new File(BaseMod.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+			ProtectionDomain ls1 = BaseMod.class.getProtectionDomain();
+			CodeSource ls2 = ls1.getCodeSource();
+			URL ls3 = ls2.getLocation();
+			URI ls4 = ls3.toURI();
+			minecraftJar = new File(ls4);
+//			minecraftJar = new File(BaseMod.class.getProtectionDomain().getCodeSource().getLocation().toURI());
 			mod_MMM_MMMLib.Debug(String.format("getMincraftFile-file:%s", minecraftJar.getName()));
 		} catch (Exception exception) {
 			mod_MMM_MMMLib.Debug("getMincrafFile-Exception.");
