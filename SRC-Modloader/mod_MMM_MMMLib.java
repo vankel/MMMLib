@@ -30,7 +30,7 @@ public class mod_MMM_MMMLib extends BaseMod {
 
 	@Override
 	public String getVersion() {
-		return "1.4.6-2";
+		return "1.4.6-3";
 	}
 	
 	@Override
@@ -55,10 +55,12 @@ public class mod_MMM_MMMLib extends BaseMod {
 	@Override
 	public void modsLoaded() {
 		// ÉçÅ[Éh
-		if (!MMM_Helper.isClient) return;
-		
-		MMM_TextureManager.loadTextures();
-		MMM_StabilizerManager.loadStabilizer();
+		if (MMM_Helper.isClient) {
+			MMM_TextureManager.loadTextures();
+			MMM_StabilizerManager.loadStabilizer();
+		} else {
+			MMM_TextureManager.loadTextureIndex();
+		}
 	}
 
 	@Override
@@ -93,5 +95,6 @@ public class mod_MMM_MMMLib extends BaseMod {
 		
 		return true;
 	}
-	
+
+
 }

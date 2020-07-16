@@ -1,5 +1,8 @@
 package net.minecraft.src;
 
+import java.io.ByteArrayInputStream;
+import java.nio.ByteBuffer;
+
 import net.minecraft.client.Minecraft;
 
 public class MMM_Helper {
@@ -97,10 +100,10 @@ public class MMM_Helper {
 	}
 	
 	public static void setInt(byte[] pData, int pIndex, int pVal) {
-    	pData[pIndex++]	= (byte)(pVal & 0xff);
-    	pData[pIndex++]	= (byte)((pVal >>> 8) & 0xff);
-    	pData[pIndex++]	= (byte)((pVal >>> 16) & 0xff);
-    	pData[pIndex]	= (byte)((pVal >>> 24) & 0xff);
+		pData[pIndex++]	= (byte)(pVal & 0xff);
+		pData[pIndex++]	= (byte)((pVal >>> 8) & 0xff);
+		pData[pIndex++]	= (byte)((pVal >>> 16) & 0xff);
+		pData[pIndex]	= (byte)((pVal >>> 24) & 0xff);
 	}
 	
 	public static int getInt(byte[] pData, int pIndex) {
@@ -111,11 +114,27 @@ public class MMM_Helper {
 		pData[pIndex++]	= (byte)(pVal & 0xff);
 		pData[pIndex]	= (byte)((pVal >>> 8) & 0xff);
 	}
-	
+
 	public static short getShort(byte[] pData, int pIndex) {
 		return (short)((pData[pIndex] & 0xff) | ((pData[pIndex + 1] & 0xff) << 8));
 	}
 
+	public static String getStr(byte[] pData, int pIndex, int pLen) {
+		String ls = new String(pData, pIndex, pLen);
+		return ls;
+	}
+	public static String getStr(byte[] pData, int pIndex) {
+		return getStr(pData, pIndex, pData.length - pIndex);
+	}
+
+	public static void setStr(byte[] pData, int pIndex, String pVal) {
+		byte[] lb = pVal.getBytes();
+		for (int li = pIndex; li < pData.length; li++) {
+			pData[li] = lb[li - pIndex];
+		}
+	}
+
+	// ó‹µ”»’f—vŠÖ”ŒQ
 	protected static boolean canBlockBeSeen(Entity pEntity, int x, int y, int z, boolean toTop, boolean do1, boolean do2) {
 		// ƒuƒƒbƒN‚Ì‰ÂŽ‹”»’è
 		Vec3 vec3d = Vec3.createVectorHelper(pEntity.posX, pEntity.posY + pEntity.getEyeHeight(), pEntity.posZ);

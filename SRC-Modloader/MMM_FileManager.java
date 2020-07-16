@@ -71,10 +71,9 @@ public class MMM_FileManager {
 		
 	}
 
-	
+
 	public static List<File> getModFile(String pname, String pprefix) {
 		// MODディレクトリに含まれる対象ファイルのオブジェクトを取得
-		if (MMM_Helper.mc == null) return null;
 		
 		// 検索済みかどうかの判定
 		if (fileList.containsKey(pname)) {
@@ -83,12 +82,20 @@ public class MMM_FileManager {
 		List<File> llist = new ArrayList<File>();
 		fileList.put(pname, llist);
 		
+		// modsディレクトリの獲得
+		File lmod;
+		if (MMM_Helper.isClient) {
+			lmod = new File(MMM_Helper.mc.getMinecraftDir(), "/mods/");
+		} else {
+			lmod = MinecraftServer.getServer().getFile("mods/");
+		}
+		
+		mod_MMM_MMMLib.Debug(String.format("getModFile:[%s]:%s", pname, lmod.getAbsolutePath()));
 		// ファイル・ディレクトリを検索
 		try {
-			File f = new File(MMM_Helper.mc.getMinecraftDir(), "/mods/");
-			if (f.isDirectory()) {
-				mod_MMM_MMMLib.Debug(String.format("getModFile-get:%d.", f.list().length));
-				for (File t : f.listFiles()) {
+			if (lmod.isDirectory()) {
+				mod_MMM_MMMLib.Debug(String.format("getModFile-get:%d.", lmod.list().length));
+				for (File t : lmod.listFiles()) {
 					if (t.getName().indexOf(pprefix) != -1) {
 						if (t.getName().endsWith(".zip")) {
 							llist.add(t);
