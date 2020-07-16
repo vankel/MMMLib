@@ -178,7 +178,7 @@ public class MMM_ModelRenderer extends ModelRenderer {
             // アイテムに色付け
             pRender.loadTexture("/gui/items.png");
             for (int j = 0; j <= (itemstack.getItem().requiresMultipleRenderPasses() ? 1 : 0); j++) {
-                int k = Item.itemsList[itemstack.itemID].getColorFromDamage(itemstack.getItemDamage(), j);
+                int k = itemstack.getItem().getColorFromItemStack(itemstack, j);
                 float f15 = (float)(k >> 16 & 0xff) / 255F;
                 float f17 = (float)(k >> 8 & 0xff) / 255F;
                 float f19 = (float)(k & 0xff) / 255F;

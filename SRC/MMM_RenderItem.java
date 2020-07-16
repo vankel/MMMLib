@@ -81,16 +81,16 @@ public class MMM_RenderItem extends RenderItem {
 	}
 
 	@Override
-    public void drawItemIntoGui(FontRenderer pFontrenderer, RenderEngine pRenderengine, int pIndex, int pDamage, int pIcon, int pX, int pY) {
+    public void renderItemIntoGUI(FontRenderer pFontrenderer, RenderEngine pRenderengine, ItemStack pItemStack, int pX, int pY) {
 		try {
 			Method lmethod;
-			lmethod = Item.itemsList[pIndex].getClass().getMethod("drawItemIntoGui", FontRenderer.class, RenderEngine.class, int.class, int.class, int.class, int.class, int.class);
-			if ((Boolean)lmethod.invoke(null, pFontrenderer, pRenderengine, pIndex, pDamage, pIcon, pX, pY)) {
+			lmethod = pItemStack.getItem().getClass().getMethod("renderItemIntoGUI", FontRenderer.class, RenderEngine.class, int.class, int.class, int.class, int.class, int.class);
+			if ((Boolean)lmethod.invoke(null, pFontrenderer, pRenderengine, pItemStack, pX, pY)) {
 				return;
 			}
 		} catch (Exception e) {
 		}
-		super.drawItemIntoGui(pFontrenderer, pRenderengine, pIndex, pDamage, pIcon, pX, pY);
+		super.renderItemIntoGUI(pFontrenderer, pRenderengine, pItemStack, pX, pY);
     }
     
 }
