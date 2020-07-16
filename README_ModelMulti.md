@@ -1,7 +1,6 @@
 ## ModelMultiBase
 - マルチモデルについて
-    - MMM_TextureManagerで管理されるマルチモデルは、最低限MMM_ModelMultiBaseを継承し、
-    - 一定の手続きに基づいて作成されていれば、対応MOD全てで表示を行うことができるようになっています。	
+    - MMM_TextureManagerで管理されるマルチモデルは、最低限MMM_ModelMultiBaseを継承し、一定の手続きに基づいて作成されていれば、対応MOD全てで表示を行うことができるようになっています。	
 - MMMLibのデフォルトでの動作
     - 以下の文字列を含むファイルを読み込み、その中に含まれるファイルを検索します。
         - MMMLib
