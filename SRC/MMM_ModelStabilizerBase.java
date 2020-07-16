@@ -23,9 +23,15 @@ public abstract class MMM_ModelStabilizerBase extends ModelBase {
 	/**
 	 * パーツの名称。
 	 */
-	public String getName() {
-		return "";
+	public abstract String getName();
+
+	/**
+	 * 同じハードポイントに装備できるかどうか。
+	 */
+	public int getExclusive() {
+		return 0;
 	}
+	
 	/**
 	 * メイドさんのテクスチャをそのまま使わずに、違うテクスチャを使うか？
 	 */
@@ -38,6 +44,19 @@ public abstract class MMM_ModelStabilizerBase extends ModelBase {
 	 */
 	public void init(MMM_EquippedStabilizer pequipped) {
 		// 変数などを定義する
+	}
+	
+	@Deprecated
+	@Override
+	public void render(Entity par1Entity, float par2, float par3, float par4, float par5, float par6, float par7) {
+		super.render(par1Entity, par2, par3, par4, par5, par6, par7);
+	}
+	
+	/**
+	 * レンダリングは基本こちらを呼ぶこと
+	 */
+	public void render(MMM_ModelBiped pModel, Entity par1Entity, float par2, float par3, float par4, float par5, float par6, float par7) {
+		render(par1Entity, par2, par3, par4, par5, par6, par7);
 	}
 	
 }

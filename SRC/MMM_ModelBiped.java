@@ -18,6 +18,7 @@ public abstract class MMM_ModelBiped extends ModelBiped {
     public MMM_ModelRenderer HardPoint[];
     
     public Render render;
+    public Map<String, MMM_EquippedStabilizer> stabiliser;
     
 
     /**
@@ -45,7 +46,7 @@ public abstract class MMM_ModelBiped extends ModelBiped {
         
         // ハードポイント
         Arms = new MMM_ModelRenderer[2];
-        HeadMount = new MMM_ModelRenderer(this, "HeadTop");
+        HeadMount = new MMM_ModelRenderer(this, "HeadMount");
         
         initModel(psize, pyoffset);
 	}
@@ -64,34 +65,72 @@ public abstract class MMM_ModelBiped extends ModelBiped {
 	}
 	
 	/**
+	 * ハードポイントに接続されたアイテムを表示する
+	 */
+    public void renderItems(EntityLiving pEntity, Render pRender) {
+    }
+    
+    @Override
+    public void render(Entity par1Entity, float par2, float par3, float par4, float par5, float par6, float par7) {
+    	if (preRender(par1Entity, par2, par3, par4, par5, par6, par7)) {
+            this.setRotationAngles((EntityLiving)par1Entity, par2, par3, par4, par5, par6, par7);
+            this.bipedHead.render(par7);
+            this.bipedBody.render(par7);
+            this.bipedRightArm.render(par7);
+            this.bipedLeftArm.render(par7);
+            this.bipedRightLeg.render(par7);
+            this.bipedLeftLeg.render(par7);
+            this.bipedHeadwear.render(par7);
+    	}
+    	renderExtention(par1Entity, par2, par3, par4, par5, par6, par7);
+    	renderStabilizer(par1Entity, stabiliser, par2, par3, par4, par5, par6, par7);
+    }
+    
+    /**
+     * 通常のレンダリング前に呼ばれる。
+     * @return falseを返すと通常のレンダリングをスキップする。
+     */
+    public boolean preRender(Entity par1Entity, float par2, float par3, float par4, float par5, float par6, float par7) {
+    	return true;
+    }
+    
+    /**
+     * 通常のレンダリング後に呼ぶ。
+     * 基本的に装飾品などの自律運動しないパーツの描画用。
+     */
+    public void renderExtention(Entity par1Entity, float par2, float par3, float par4, float par5, float par6, float par7) {    	
+    }
+    
+	/**
 	 * スタビライザーの描画。
 	 * 自動では呼ばれないのでrender内で呼ぶ必要があります。
 	 */
-    protected void renderStabilizer(EntityLiving pEntity, Map<String, MMM_EquippedStabilizer> pmap, float par2, float par3, float par4, float par5, float par6, float par7) {
+    protected void renderStabilizer(Entity pEntity, Map<String, MMM_EquippedStabilizer> pmap, float par2, float par3, float par4, float par5, float par6, float par7) {
     	// スタビライザーの描画、doRenderの方がいいか？
     	if (pmap == null || pmap.isEmpty() || render == null) return;
     	
 		GL11.glPushMatrix();
     	for (Entry<String, MMM_EquippedStabilizer> le : pmap.entrySet()) {
     		MMM_EquippedStabilizer les = le.getValue();
-    		if (les != null) {
+    		if (les != null && les.equipPoint != null) {
 				MMM_ModelStabilizerBase lsb = les.stabilizer;
 				if (lsb.isLoadAnotherTexture()) {
     				render.loadTexture(lsb.getTexture());
 				}
     			les.equipPoint.loadMatrix();
-    			lsb.render(pEntity, par2, par3, par4, par5, par6, par7);
+    			lsb.render(this, pEntity, par2, par3, par4, par5, par6, par7);
     		}
     	}
 		GL11.glPopMatrix();
     }
 	
-	/**
-	 * ハードポイントに接続されたアイテムを表示する
-	 */
-    public void renderItems(EntityLiving pEntity, Render pRender) {
-    }
+    @Deprecated
+    @Override
+    public void setRotationAngles(float par1, float par2, float par3, float par4, float par5, float par6) {}
     
+    public void setRotationAngles(EntityLiving pEntity, float par1, float par2, float par3, float par4, float par5, float par6) {
+    	super.setRotationAngles(par1, par2, par3, par4, par5, par6);
+    }
 
 	
 	// 身長

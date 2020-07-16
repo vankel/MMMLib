@@ -30,7 +30,7 @@ public class mod_MMM_MMMLib extends BaseMod {
 
 	@Override
 	public String getVersion() {
-		return "1.3.2-1";
+		return "1.3.2-2";
 	}
 	
 	@Override
@@ -62,6 +62,8 @@ public class mod_MMM_MMMLib extends BaseMod {
     	if (isDebugView) {
     		var1.put(net.minecraft.src.MMM_EntityDummy.class, new MMM_RenderDummy());
     	}
+    	//RenderItem
+    	var1.put(EntityItem.class, new MMM_RenderItem());
 	}
 
 	@Override

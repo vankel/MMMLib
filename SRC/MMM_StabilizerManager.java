@@ -1,6 +1,7 @@
 package net.minecraft.src;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import net.minecraft.client.Minecraft;
@@ -58,6 +59,15 @@ public class MMM_StabilizerManager extends MMM_ManagerBase {
 		lequip.equipPointName = pequippoint;
 		
 		return lequip;
+	}
+	
+	/**
+	 * 実装場所のアップデート
+	 */
+	public static void updateEquippedPoint(Map<String, MMM_EquippedStabilizer> pMap, ModelBase pModel) {
+		for (Entry<String, MMM_EquippedStabilizer> le : pMap.entrySet()) {
+			le.getValue().updateEquippedPoint(pModel);
+		}
 	}
 	
 }

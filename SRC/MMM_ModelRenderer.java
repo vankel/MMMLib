@@ -31,6 +31,7 @@ public class MMM_ModelRenderer extends ModelRenderer {
     public ItemStack itemstack;
     public boolean adjust;
     public FloatBuffer matrix;
+    public boolean isInvertX;
 
     
     public MMM_ModelRenderer(ModelBase pModelBase, String pName) {
@@ -44,6 +45,7 @@ public class MMM_ModelRenderer extends ModelRenderer {
     	itemstack = null;
     	adjust = true;
     	matrix = BufferUtils.createFloatBuffer(16);
+    	isInvertX = false;
     	
     }
 	
@@ -425,6 +427,9 @@ public class MMM_ModelRenderer extends ModelRenderer {
      */
     public MMM_ModelRenderer loadMatrix() {
     	GL11.glLoadMatrix(matrix);
+    	if (isInvertX) {
+    		GL11.glScalef(-1F, 1F, 1F);
+    	}
     	return this;
     }
     

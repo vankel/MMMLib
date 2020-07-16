@@ -13,7 +13,12 @@ public class MMM_EquippedStabilizer {
 	public String equipPointName;
 	public Map<String, Object> localValues;
 	
-	
+/*	
+	public MMM_EquippedStabilizer(String pEquipPointName, MMM_ModelStabilizerBase pStabilizer) {
+		equipPointName = pEquipPointName;
+		stabilizer = pStabilizer;
+	}
+*/	
 	public boolean updateEquippedPoint(ModelBase pmodel) {
 		// 取り付け位置をアップデート
 		for (int li = 0; li < pmodel.boxList.size(); li++) {
