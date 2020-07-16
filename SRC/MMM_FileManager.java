@@ -37,7 +37,8 @@ public class MMM_FileManager {
 	
 	public static List<File> getModFile(String pname, String pprefix) {
 		// MODディレクトリに含まれる対象ファイルのオブジェクトを取得
-
+		if (mc == null) return null;
+		
 		// 検索済みかどうかの判定
 		if (fileList.containsKey(pname)) {
 			return fileList.get(pname);

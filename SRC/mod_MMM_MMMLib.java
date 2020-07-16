@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.server.MinecraftServer;
 
 public class mod_MMM_MMMLib extends BaseMod {
 
@@ -30,7 +31,7 @@ public class mod_MMM_MMMLib extends BaseMod {
 
 	@Override
 	public String getVersion() {
-		return "1.4.2-1";
+		return "1.4.2-2";
 	}
 	
 	@Override
@@ -41,8 +42,12 @@ public class mod_MMM_MMMLib extends BaseMod {
 	@Override
 	public void load() {
 		// ‰Šú‰»
-		minecraft = ModLoader.getMinecraftInstance();
-		MMM_FileManager.init(ModLoader.getMinecraftInstance());
+		try {
+			minecraft = ModLoader.getMinecraftInstance();
+		} catch (Error e) {
+//			MinecraftServer mcs = ModLoader.getMinecraftServerInstance();
+		}
+		MMM_FileManager.init(minecraft);
 		MMM_TextureManager.init();
 		MMM_StabilizerManager.init();
 		if (isDebugView) {
@@ -54,6 +59,8 @@ public class mod_MMM_MMMLib extends BaseMod {
 	@Override
 	public void modsLoaded() {
 		// ƒ[ƒh
+		if (minecraft == null) return;
+		
 		MMM_TextureManager.loadTextures();
 		MMM_StabilizerManager.loadStabilizer();
 	}
