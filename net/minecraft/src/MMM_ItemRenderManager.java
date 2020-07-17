@@ -5,33 +5,66 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+
+import net.minecraftforge.client.IItemRenderer;
+
+import org.lwjgl.opengl.EXTRescaleNormal;
+import org.lwjgl.opengl.GL11;
 
 public class MMM_ItemRenderManager {
 
 	protected static Map<Object, MMM_ItemRenderManager> classList = new HashMap<Object, MMM_ItemRenderManager>();
 	protected static List<Object> checkList = new ArrayList<Object>();
+	protected static MMM_ItemRendererForge forgeRender;
+	protected Random random;
 	
-	private Object fobject;
-	private Method frenderItem;
-	private Method frenderItemInFirstPerson;
-	private Method fgetRenderTexture;
-	private Method frenderItemWorld;
-	private MMM_IItemRenderManager exRender;
+	protected Object fobject;
+	protected Method frenderItem;
+	protected Method frenderItemInFirstPerson;
+	protected Method fgetRenderTexture;
+	protected Method frenderItemWorld;
+	protected MMM_IItemRenderManager exRender;
+
 
 
 	private MMM_ItemRenderManager(Object pObject, Method prenderItem, Method prenderItemInFirstPerson,
 			Method pgetRenderTexture, Method prenderItemWorld) {
 		fobject = pObject;
+		exRender = null;
 		frenderItem = prenderItem;
 		frenderItemInFirstPerson = prenderItemInFirstPerson;
 		fgetRenderTexture = pgetRenderTexture;
 		frenderItemWorld = prenderItemWorld;
-		exRender = null;
+		random = new Random();
 	}
-	
+
 	private MMM_ItemRenderManager(Object pObject, MMM_IItemRenderManager pEXRender) {
 		fobject = pObject;
 		exRender = pEXRender;
+//		frenderItem = pEXRender.getClass().getDeclaredMethod("renderItem", EntityLivingBase.class, ItemStack.class, int.class);
+//		frenderItemInFirstPerson = prenderItemInFirstPerson;
+//		fgetRenderTexture = pgetRenderTexture;
+//		frenderItemWorld = prenderItemWorld;
+		random = new Random();
+		if (MMM_Helper.isForge) {
+			registerForge((Item)pObject, pEXRender);
+		}
+	}
+
+	public static void registerForge(Item pItem, MMM_IItemRenderManager pEXRender) {
+		if (forgeRender == null) {
+			forgeRender = new MMM_ItemRendererForge();
+		}
+		try {
+			Class lc = Class.forName("net.minecraftforge.client.MinecraftForgeClient");
+			Method lm = lc.getDeclaredMethod("registerItemRenderer", int.class, IItemRenderer.class);
+			lm.invoke(null, pItem.itemID, forgeRender);
+		} catch (Exception e) {
+//			MinecraftForgeClient.registerItemRenderer(pItem.itemID, forgeRender);
+			e.printStackTrace();
+		}
+		mod_MMM_MMMLib.Debug("registerForge:%s", pItem.getClass().getSimpleName());
 	}
 
 	public static boolean setEXRender(Item pItem, MMM_IItemRenderManager pEXRender) {
@@ -85,8 +118,60 @@ public class MMM_ItemRenderManager {
 	}
 
 
+	public void renderItemLocal(EntityLivingBase entityliving, ItemStack itemstack, int i) {
+		Item litem = itemstack.getItem();
+		// 特殊レンダラ
+		MMM_Client.setTexture(getRenderTexture(itemstack));
+		GL11.glPushMatrix();
+		boolean lflag = renderItem(entityliving, itemstack, i);
+		GL11.glPopMatrix();
+		if (lflag) {
+			if (itemstack != null && itemstack.hasEffect() && i == 0) {
+				GL11.glDepthFunc(GL11.GL_EQUAL);
+				GL11.glDisable(GL11.GL_LIGHTING);
+				MMM_Client.setTexture(MMM_ItemRenderer.texGlint);
+				GL11.glEnable(GL11.GL_BLEND);
+				GL11.glBlendFunc(GL11.GL_SRC_COLOR, GL11.GL_ONE);
+				float var14 = 0.76F;
+				GL11.glColor4f(0.5F * var14, 0.25F * var14, 0.8F * var14, 1.0F);
+				float var15 = 0.125F;
+				
+				GL11.glPushMatrix();
+				GL11.glMatrixMode(GL11.GL_TEXTURE);
+				GL11.glLoadIdentity();
+				GL11.glScalef(var15, var15, var15);
+				float var16 = (float)(Minecraft.getSystemTime() % 3000L) / 3000.0F * 8.0F;
+				GL11.glTranslatef(var16, 0.0F, 0.0F);
+				GL11.glRotatef(-50.0F, 0.0F, 0.0F, 1.0F);
+				GL11.glMatrixMode(GL11.GL_MODELVIEW);
+				renderItem(entityliving, itemstack, 0);
+//				renderItemIn2D(var6, 0.0F, 0.0F, 1.0F, 1.0F, 256, 256, 0.0625F);
+				GL11.glPopMatrix();
+				
+				GL11.glPushMatrix();
+				GL11.glMatrixMode(GL11.GL_TEXTURE);
+				GL11.glLoadIdentity();
+				GL11.glScalef(var15, var15, var15);
+				var16 = (float)(Minecraft.getSystemTime() % 4873L) / 4873.0F * 8.0F;
+				GL11.glTranslatef(-var16, 0.0F, 0.0F);
+				GL11.glRotatef(10.0F, 0.0F, 0.0F, 1.0F);
+				GL11.glMatrixMode(GL11.GL_MODELVIEW);
+				renderItem(entityliving, itemstack, 0);
+//				renderItemIn2D(var6, 0.0F, 0.0F, 1.0F, 1.0F, 256, 256, 0.0625F);
+				GL11.glPopMatrix();
+				
+				GL11.glMatrixMode(GL11.GL_TEXTURE);
+				GL11.glLoadIdentity();
+				GL11.glMatrixMode(GL11.GL_MODELVIEW);
+				GL11.glDisable(GL11.GL_BLEND);
+				GL11.glEnable(GL11.GL_LIGHTING);
+				GL11.glDepthFunc(GL11.GL_LEQUAL);
+			}
+			return;
+		}
+	}
 
-	public boolean renderItem(EntityLivingBase pEntity, ItemStack pItemstack, int pIndex) {
+	public boolean renderItem(Entity pEntity, ItemStack pItemstack, int pIndex) {
 		if (exRender != null) {
 			return exRender.renderItem(pEntity, pItemstack, pIndex);
 		} else if (frenderItem != null) {
@@ -98,21 +183,67 @@ public class MMM_ItemRenderManager {
 		return false;
 	}
 
-	public boolean renderItemInFirstPerson(float pDelta, MMM_ItemRenderer pItemRenderer) {
+	public boolean renderItemInFirstPerson(Entity pEntity, ItemStack pItemStack, float pDeltaTimepRenderPhatialTick) {
+//	public boolean renderItemInFirstPerson(float pDelta, MMM_ItemRenderer pItemRenderer) {
 		if (exRender != null) {
-			return exRender.renderItemInFirstPerson(pDelta, pItemRenderer);
+			return exRender.renderItemInFirstPerson(MMM_Helper.mc.thePlayer, pItemStack, pDeltaTimepRenderPhatialTick);
+//			return exRender.renderItemInFirstPerson(pDelta, pItemRenderer);
 		} else if (frenderItemInFirstPerson != null) {
 			try {
-				return (Boolean)frenderItemInFirstPerson.invoke(fobject, pDelta);
+				return (Boolean)frenderItemInFirstPerson.invoke(fobject, MMM_Helper.mc.thePlayer, pItemStack, pDeltaTimepRenderPhatialTick);
 			} catch (Exception e) {
 			}
 		}
 		return false;
 	}
 
-	public ResourceLocation getRenderTexture() {
+	public boolean renderItemWorld(EntityItem entityitem, double d, double d1, double d2, float f, float f1) {
+		ItemStack lis = entityitem.getEntityItem();
+		MMM_ItemRenderManager lirm = MMM_ItemRenderManager.getEXRender(lis.getItem());
+		if (!lirm.isRenderItemWorld(lis)) return false;
+		
+		// テクスチャ
+		MMM_Client.setTexture(lirm.getRenderTexture(lis));
+		// 描画
+		random.setSeed(187L);
+		GL11.glPushMatrix();
+		float f2 = MathHelper.sin(((float)entityitem.age + f1) / 10F + entityitem.hoverStart) * 0.1F + 0.1F;
+		float f3 = (((float)entityitem.age + f1) / 20F + entityitem.hoverStart) * 57.29578F;
+		byte byte0 = 1;
+		if (lis.stackSize > 1) {
+			byte0 = 2;
+		}
+		if (lis.stackSize > 5) {
+			byte0 = 3;
+		}
+		if (lis.stackSize > 20) {
+			byte0 = 4;
+		}
+		GL11.glTranslatef((float)d, (float)d1 + f2, (float)d2);
+		GL11.glEnable(EXTRescaleNormal.GL_RESCALE_NORMAL_EXT);
+		GL11.glRotatef(f3, 0.0F, 1.0F, 0.0F);
+		float f4 = 1.0F; //0.25F;
+		for (int j = 0; j < byte0; j++) {
+			GL11.glPushMatrix();
+			if (j > 0) {
+				float f5 = ((random.nextFloat() * 2.0F - 1.0F) * 0.2F) / f4;
+				float f7 = ((random.nextFloat() * 2.0F - 1.0F) * 0.2F) / f4;
+				float f9 = ((random.nextFloat() * 2.0F - 1.0F) * 0.2F) / f4;
+				GL11.glTranslatef(f5, f7, f9);
+			}
+			lirm.renderItem(null, lis, 0);
+			GL11.glPopMatrix();
+		}
+		
+		GL11.glPopMatrix();
+		return true;
+	}
+
+
+
+	public ResourceLocation getRenderTexture(ItemStack pItemStack) {
 		if (exRender != null) {
-			return exRender.getRenderTexture();
+			return exRender.getRenderTexture(pItemStack);
 		} else if (fgetRenderTexture != null) {
 			try {
 				return (ResourceLocation)fgetRenderTexture.invoke(fobject);
@@ -122,14 +253,28 @@ public class MMM_ItemRenderManager {
 		return null;
 	}
 
-	public boolean isRenderItemWorld() {
+	public boolean isRenderItemWorld(ItemStack pItemStack) {
 		if (exRender != null) {
-			return exRender.isRenderItemWorld();
+			return exRender.isRenderItemWorld(pItemStack);
 		} else if (frenderItemWorld != null) {
 			try {
 				return (Boolean)frenderItemWorld.invoke(fobject);
 			} catch (Exception e) {
 			}
+		}
+		return false;
+	}
+
+	public boolean isRenderItemInFirstPerson(ItemStack pItemStack) {
+		if (exRender != null) {
+			return exRender.isRenderItemInFirstPerson(pItemStack);
+		}
+		return false;
+	}
+
+	public boolean isRenderItem(ItemStack pItemStack) {
+		if (exRender != null) {
+			return exRender.isRenderItem(pItemStack);
 		}
 		return false;
 	}

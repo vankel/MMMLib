@@ -46,7 +46,7 @@ public class MMM_ItemRenderer extends ItemRenderer {
 		if (MMM_ItemRenderManager.isEXRender(litem)) {
 			// “ÁŽêƒŒƒ“ƒ_ƒ‰
 			MMM_ItemRenderManager lii = MMM_ItemRenderManager.getEXRender(litem);
-			MMM_Client.setTexture(lii.getRenderTexture());
+			MMM_Client.setTexture(lii.getRenderTexture(itemstack));
 			GL11.glPushMatrix();
 			boolean lflag = lii.renderItem(entityliving, itemstack, i);
 			GL11.glPopMatrix();
@@ -116,7 +116,7 @@ public class MMM_ItemRenderer extends ItemRenderer {
 		if (itemToRender != null) {
 			Item litem = itemToRender.getItem();
 			if (MMM_ItemRenderManager.isEXRender(litem)) {
-				if (MMM_ItemRenderManager.getEXRender(litem).renderItemInFirstPerson(f, this)) {
+				if (MMM_ItemRenderManager.getEXRender(litem).renderItemInFirstPerson(MMM_Helper.mc.thePlayer, itemToRender, f)) {
 					return;
 				}
 			}
