@@ -64,6 +64,7 @@ public class MMM_TextureBox extends MMM_TextureBoxBase {
 		modelName = pModelName;
 		models = pModels == null ? pDefModels : pModels;
 		textureName = (new StringBuilder()).append(packegeName).append("_").append(modelName).toString();
+		isUpdateSize = (models != null && models[0] != null) ? MMM_ModelCapsHelper.getCapsValueBoolean(models[0], MMM_IModelCaps.caps_isUpdateSize) : false;
 	}
 
 	/**
@@ -163,23 +164,23 @@ public class MMM_TextureBox extends MMM_TextureBoxBase {
 	}
 
 	@Override
-	public float getHeight() {
-		return models != null ? models[0].getHeight() : modelHeight;
+	public float getHeight(MMM_IModelCaps pEntityCaps) {
+		return models != null ? models[0].getHeight(pEntityCaps) : modelHeight;
 	}
 
 	@Override
-	public float getWidth() {
-		return models != null ? models[0].getWidth() : modelWidth;
+	public float getWidth(MMM_IModelCaps pEntityCaps) {
+		return models != null ? models[0].getWidth(pEntityCaps) : modelWidth;
 	}
 
 	@Override
-	public float getYOffset() {
-		return models != null ? models[0].getyOffset() : modelYOffset;
+	public float getYOffset(MMM_IModelCaps pEntityCaps) {
+		return models != null ? models[0].getyOffset(pEntityCaps) : modelYOffset;
 	}
 
 	@Override
-	public float getMountedYOffset() {
-		return models != null ? models[0].getMountedYOffset() : modelMountedYOffset;
+	public float getMountedYOffset(MMM_IModelCaps pEntityCaps) {
+		return models != null ? models[0].getMountedYOffset(pEntityCaps) : modelMountedYOffset;
 	}
 
 	public MMM_TextureBox duplicate() {
@@ -192,6 +193,7 @@ public class MMM_TextureBox extends MMM_TextureBoxBase {
 		lbox.textures = textures;
 		lbox.armors = armors;
 		lbox.models = models;
+		lbox.isUpdateSize = lbox.isUpdateSize;
 		
 		return lbox;
 	}
