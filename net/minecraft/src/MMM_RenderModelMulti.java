@@ -25,6 +25,7 @@ public class MMM_RenderModelMulti extends RenderLiving {
 	protected int showArmorParts(EntityLivingBase par1EntityLiving, int par2, float par3) {
 		// アーマーの表示設定
 		modelFATT.renderParts = par2;
+		modelFATT.renderCount = 0;
 		ItemStack is = par1EntityLiving.getCurrentItemOrArmor(par2 + 1);
 		if (is != null && is.stackSize > 0) {
 			modelFATT.showArmorParts(par2);
@@ -61,6 +62,7 @@ public class MMM_RenderModelMulti extends RenderLiving {
 			modelFATT.textureOuter = ltentity.getTextures(2);
 			modelFATT.textureInnerLight = ltentity.getTextures(3);
 			modelFATT.textureOuterLight = ltentity.getTextures(4);
+			modelFATT.textureLightColor = (float[])modelFATT.getCapsValue(MMM_IModelCaps.caps_textureLightColor, pEntityCaps);
 		}
 		modelMain.setEntityCaps(pEntityCaps);
 		modelFATT.setEntityCaps(pEntityCaps);
@@ -70,6 +72,8 @@ public class MMM_RenderModelMulti extends RenderLiving {
 		modelFATT.showAllParts();
 		modelMain.isAlphablend = true;
 		modelFATT.isAlphablend = true;
+		modelMain.renderCount = 0;
+		modelFATT.renderCount = 0;
 		modelMain.lighting = modelFATT.lighting = par1EntityLiving.getBrightnessForRender(par8);
 		
 		modelMain.setCapsValue(MMM_IModelCaps.caps_heldItemLeft, (Integer)0);
@@ -140,6 +144,21 @@ public class MMM_RenderModelMulti extends RenderLiving {
 	protected ResourceLocation func_110775_a(Entity var1) {
 		// テクスチャリソースを返すところだけれど、基本的に使用しない。
 		return null;
+	}
+
+	@Override
+	protected int getColorMultiplier(EntityLivingBase par1EntityLivingBase,
+			float par2, float par3) {
+		modelMain.renderCount = 16;
+		return super.getColorMultiplier(par1EntityLivingBase, par2, par3);
+	}
+
+	@Override
+	protected int inheritRenderPass(EntityLivingBase par1EntityLivingBase,
+			int par2, float par3) {
+		int li = super.inheritRenderPass(par1EntityLivingBase, par2, par3);
+		modelFATT.renderCount = 16;
+		return li;
 	}
 
 }
