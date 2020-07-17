@@ -346,7 +346,7 @@ public class MMM_ModelRenderer {
 		ItemStack[] litemstacks = (ItemStack[])MMM_ModelCapsHelper.getCapsValue(pEntityCaps, caps_Items);
 		if (litemstacks == null) return false;
 		EnumAction[] lactions = (EnumAction[])MMM_ModelCapsHelper.getCapsValue(pEntityCaps, caps_Actions);
-		EntityLiving lentity = (EntityLiving)pEntityCaps.getCapsValue(caps_Entity);
+		EntityLivingBase lentity = (EntityLivingBase)pEntityCaps.getCapsValue(caps_Entity);
 		
 		renderItems(lentity, pModelMulti.render, pRealBlock, lactions[pIndex], litemstacks[pIndex]);
 		return true;
@@ -354,18 +354,18 @@ public class MMM_ModelRenderer {
 
 	public void renderItemsHead(MMM_ModelMultiBase pModelMulti, MMM_IModelCaps pEntityCaps) {
 		ItemStack lis = (ItemStack)pEntityCaps.getCapsValue(caps_HeadMount);
-		EntityLiving lentity = (EntityLiving)pEntityCaps.getCapsValue(caps_Entity);
+		EntityLivingBase lentity = (EntityLivingBase)pEntityCaps.getCapsValue(caps_Entity);
 		
 		renderItems(lentity, pModelMulti.render, true, null, lis);
 	}
 
-	protected void renderItems(EntityLiving pEntityLiving, Render pRender,
+	protected void renderItems(EntityLivingBase pEntityLiving, Render pRender,
 			boolean pRealBlock, EnumAction pAction, ItemStack pItemStack) {
 		itemstack = pItemStack;
 		renderItems(pEntityLiving, pRender, pRealBlock, pAction);
 	}
 
-	protected void renderItems(EntityLiving pEntityLiving, Render pRender, boolean pRealBlock, EnumAction pAction) {
+	protected void renderItems(EntityLivingBase pEntityLiving, Render pRender, boolean pRealBlock, EnumAction pAction) {
 		if (itemstack == null) return;
 		
 		// アイテムのレンダリング
@@ -441,7 +441,7 @@ public class MMM_ModelRenderer {
 			TileEntitySkullRenderer.skullRenderer.func_82393_a(-0.5F, -0.25F, -0.5F, 1, 180.0F,
 					itemstack.getItemDamage(), lsowner);
 		} else if (pRealBlock && itemstack.getItem() instanceof ItemBlock) {
-			pRender.loadTexture("/terrain.png");
+//			pRender.loadTexture("/terrain.png");
 //			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 			GL11.glEnable(GL11.GL_CULL_FACE);
 			pRender.renderBlocks.renderBlockAsItem(
@@ -450,7 +450,7 @@ public class MMM_ModelRenderer {
 			GL11.glDisable(GL11.GL_CULL_FACE);
 		} else {
 			// アイテムに色付け
-			pRender.loadTexture("/gui/items.png");
+//			pRender.loadTexture("/gui/items.png");
 			for (int j = 0; j <= (itemstack.getItem()
 					.requiresMultipleRenderPasses() ? 1 : 0); j++) {
 				int k = itemstack.getItem().getColorFromItemStack(itemstack, j);

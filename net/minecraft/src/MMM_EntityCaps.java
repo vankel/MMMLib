@@ -5,13 +5,14 @@ import java.util.Map;
 
 public class MMM_EntityCaps implements MMM_IModelCaps {
 
-	protected EntityLiving owner;
+	protected EntityLivingBase owner;
 	private static Map<String, Integer> caps;
 
 	static {
 		caps = new HashMap<String, Integer>();
 		caps.put("Entity", caps_Entity);
 		caps.put("health", caps_health);
+		caps.put("healthFloat", caps_healthFloat);
 		caps.put("ticksExisted", caps_ticksExisted);
 		caps.put("heldItems", caps_heldItems);
 		caps.put("currentEquippedItem", caps_currentEquippedItem);
@@ -48,13 +49,19 @@ public class MMM_EntityCaps implements MMM_IModelCaps {
 		caps.put("WorldTotalTime", caps_WorldTotalTime);
 		caps.put("WorldTime", caps_WorldTime);
 		caps.put("MoonPhase", caps_MoonPhase);
+		caps.put("rotationYaw", caps_rotationYaw);
+		caps.put("rotationPitch", caps_rotationPitch);
+		caps.put("prevRotationYaw", caps_prevRotationYaw);
+		caps.put("prevRotationPitch", caps_prevRotationPitch);
+		caps.put("renderYawOffset", caps_renderYawOffset);
+
 	}
 
 	public static Map<String, Integer> getStaticModelCaps() {
 		return caps;
 	}
 
-	public MMM_EntityCaps(EntityLiving pOwner) {
+	public MMM_EntityCaps(EntityLivingBase pOwner) {
 		owner = pOwner;
 	}
 
@@ -69,14 +76,16 @@ public class MMM_EntityCaps implements MMM_IModelCaps {
 		case caps_Entity:
 			return owner;
 		case caps_health:
-			return owner.getHealth();
+			return (int)owner.func_110143_aJ();
+		case caps_healthFloat:
+			return owner.func_110143_aJ();
 		case caps_ticksExisted:
 			return owner.ticksExisted;
 		case caps_heldItems:
 		case caps_currentEquippedItem:
 			return owner.getHeldItem();
 		case caps_currentArmor:
-			return owner.getCurrentArmor((Integer)pArg[0]);
+			return owner.getCurrentItemOrArmor((Integer)pArg[0] + 1);
 		case caps_posX:
 			return owner.posX;
 		case caps_posY:
@@ -101,6 +110,18 @@ public class MMM_EntityCaps implements MMM_IModelCaps {
 			} else {
 				return (Integer)pArg[0] == 0 ? owner.motionX : (Integer)pArg[0] == 1 ? owner.motionY : owner.motionZ;
 			}
+			
+		case caps_rotationYaw:
+			return owner.rotationYaw;
+		case caps_rotationPitch:
+			return owner.rotationPitch;
+		case caps_prevRotationYaw:
+			return owner.prevRotationYaw;
+		case caps_prevRotationPitch:
+			return owner.prevRotationPitch;
+		case caps_renderYawOffset:
+			return owner.renderYawOffset;
+			
 		case caps_onGround:
 			return owner.onGround;
 		case caps_isRiding:
@@ -121,8 +142,8 @@ public class MMM_EntityCaps implements MMM_IModelCaps {
 			return owner.isSwingInProgress;
 		case caps_isSneak:
 			return owner.isSneaking();
-		case caps_isBlocking:
-			return owner.isBlocking();
+//		case caps_isBlocking:
+//			return owner.isBlocking();
 		case caps_isBurning:
 			return owner.isBurning();
 		case caps_isInWater:

@@ -1,22 +1,17 @@
 package net.minecraft.src;
 
 import static net.minecraft.src.mod_MMM_MMMLib.Debug;
-import java.io.ByteArrayInputStream;
+
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.swing.DebugGraphics;
-
-import net.minecraft.client.Minecraft;
 
 public class MMM_Helper {
 
@@ -512,7 +507,7 @@ public class MMM_Helper {
 	 * ŒŸ’m—Ìˆæ‚ÌŠg‘å”ÍˆÍ
 	 * @return
 	 */
-	public static Entity getRayTraceEntity(EntityLiving pEntity, double pRange, float pDelta, float pExpand) {
+	public static Entity getRayTraceEntity(EntityLivingBase pEntity, double pRange, float pDelta, float pExpand) {
 		Vec3 lvpos = pEntity.worldObj.getWorldVec3Pool().getVecFromPool(
 				pEntity.posX, pEntity.posY + pEntity.getEyeHeight(), pEntity.posZ);
 //		Vec3 lvpos = pEntity.getPosition(pDelta).addVector(0D, pEntity.getEyeHeight(), 0D);
@@ -626,6 +621,16 @@ public class MMM_Helper {
 		int li = Integer.parseInt(ls.substring(llen - 4, llen), 16);
 		int lj = Integer.parseInt(ls.substring(llen - 8, llen - 4), 16);
 		return (lj << 16) | li;
+	}
+
+	/**
+	 *  ƒAƒCƒeƒ€‚ÉÝ’è‚³‚ê‚½UŒ‚—Í‚ðŒ©‚é
+	 * @param pItemStack
+	 * @return
+	 */
+	public static double getAttackVSEntity(ItemStack pItemStack) {
+		AttributeModifier lam = (AttributeModifier)pItemStack.func_111283_C().get(SharedMonsterAttributes.field_111264_e.func_111108_a());
+		return lam == null ? 0 : lam.func_111164_d();
 	}
 
 }

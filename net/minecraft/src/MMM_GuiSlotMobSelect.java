@@ -1,11 +1,7 @@
 package net.minecraft.src;
 
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.GL13;
-
-import net.minecraft.client.Minecraft;
 
 public class MMM_GuiSlotMobSelect extends GuiSlot {
 

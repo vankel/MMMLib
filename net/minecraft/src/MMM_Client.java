@@ -75,20 +75,12 @@ public class MMM_Client {
 		return MMM_Helper.mc.isIntegratedServerRunning();
 	}
 
-	public static void setArmorPrefix() {
-		// アーマープリフィックスを設定
-		try {
-			ModLoader.setPrivateValue(RenderBiped.class, null, 4, ModLoader.getPrivateValue(RenderPlayer.class, null, 3));
-		} catch (Exception e) {
-		}
-	}
-
 	/**
 	 * Duoを使う時は必ずRender側のこの関数を置き換えること。
 	 * @param par1EntityLiving
 	 * @param par2
 	 */
-	public static void renderArrowsStuckInEntity(EntityLiving par1EntityLiving, float par2,
+	public static void renderArrowsStuckInEntity(EntityLivingBase par1EntityLiving, float par2,
 			Render pRender, MMM_ModelBase pModel) {
 		int lacount = par1EntityLiving.getArrowCountInEntity();
 		
@@ -145,5 +137,14 @@ public class MMM_Client {
 		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit,
 				(float) ls / 1.0F, (float) lt / 1.0F);
 	}
-	
+
+	public static void setTexture(ResourceLocation pRLocation) {
+		if (pRLocation != null) {
+			MMM_Helper.mc.func_110434_K().func_110577_a(pRLocation);
+		}
+	}
+
+	public static String getVersionString() {
+		return Minecraft.func_110431_a(Minecraft.getMinecraft());
+	}
 }

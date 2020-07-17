@@ -1,11 +1,6 @@
 package net.minecraft.src;
 
-import java.lang.reflect.Method;
-
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
-
-import net.minecraft.client.Minecraft;
 
 public class MMM_ItemRenderer extends ItemRenderer {
 
@@ -14,12 +9,19 @@ public class MMM_ItemRenderer extends ItemRenderer {
 	public ItemStack itemToRender;
 	public float equippedProgress;
 	public float prevEquippedProgress;
+	protected static ResourceLocation texGlint;
 
 
 	public MMM_ItemRenderer(Minecraft minecraft) {
 		super(minecraft);
 		
 		mc = minecraft;
+		try {
+			// きらめきテクスチャの確保
+			texGlint = (ResourceLocation)ModLoader.getPrivateValue(ItemRenderer.class, null, 0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public Minecraft getMC() {
@@ -39,14 +41,12 @@ public class MMM_ItemRenderer extends ItemRenderer {
 	}
 
 	@Override
-	public void renderItem(EntityLiving entityliving, ItemStack itemstack, int i) {
+	public void renderItem(EntityLivingBase entityliving, ItemStack itemstack, int i) {
 		Item litem = itemstack.getItem();
 		if (MMM_ItemRenderManager.isEXRender(litem)) {
+			// 特殊レンダラ
 			MMM_ItemRenderManager lii = MMM_ItemRenderManager.getEXRender(litem);
-			String ltex = lii.getRenderTexture();
-			if (ltex != null) {
-				this.mc.renderEngine.bindTexture(ltex);
-			}
+			MMM_Client.setTexture(lii.getRenderTexture());
 			GL11.glPushMatrix();
 			boolean lflag = lii.renderItem(entityliving, itemstack, i);
 			GL11.glPopMatrix();
@@ -54,7 +54,7 @@ public class MMM_ItemRenderer extends ItemRenderer {
 				if (itemstack != null && itemstack.hasEffect() && i == 0) {
 					GL11.glDepthFunc(GL11.GL_EQUAL);
 					GL11.glDisable(GL11.GL_LIGHTING);
-					this.mc.renderEngine.bindTexture("%blur%/misc/glint.png");
+					MMM_Client.setTexture(texGlint);
 					GL11.glEnable(GL11.GL_BLEND);
 					GL11.glBlendFunc(GL11.GL_SRC_COLOR, GL11.GL_ONE);
 					float var14 = 0.76F;
@@ -106,10 +106,11 @@ public class MMM_ItemRenderer extends ItemRenderer {
 		
 		try {
 			// ローカル変数を確保
-			itemToRender = (ItemStack)ModLoader.getPrivateValue(ItemRenderer.class, this, 1);
-			equippedProgress = (Float)ModLoader.getPrivateValue(ItemRenderer.class, this, 2);
-			prevEquippedProgress = (Float)ModLoader.getPrivateValue(ItemRenderer.class, this, 3);
+			itemToRender = (ItemStack)ModLoader.getPrivateValue(ItemRenderer.class, this, 4);
+			equippedProgress = (Float)ModLoader.getPrivateValue(ItemRenderer.class, this, 5);
+			prevEquippedProgress = (Float)ModLoader.getPrivateValue(ItemRenderer.class, this, 6);
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		
 		if (itemToRender != null) {

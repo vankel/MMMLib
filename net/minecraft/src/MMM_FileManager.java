@@ -4,17 +4,14 @@ import java.io.File;
 import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLConnection;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.jar.JarFile;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 
 /**
@@ -27,15 +24,17 @@ public class MMM_FileManager {
 	public static File minecraftJar;
 	public static Map<String, List<File>> fileList = new TreeMap<String, List<File>>();
 	public static File minecraftDir;
+	public static File versionDir;
+	public static File modDir;
+
 	
 	public static void init() {
 		// 初期化
 		if (MMM_Helper.isClient) {
-			minecraftDir = MMM_Helper.mc.getMinecraftDir();
+			minecraftDir = MMM_Helper.mc.mcDataDir;
 		} else {
 			minecraftDir = MinecraftServer.getServer().getFile("");
 		}
-		
 		
 		// mincraft.jarを取得
 		// 開発中用のJar内に含まれていることの対策
@@ -73,6 +72,19 @@ public class MMM_FileManager {
 			minecraftJar = new File(ls);
 			mod_MMM_MMMLib.Debug("getMinecraftFile-file:%s", ls);
 		}
+		if (!MMM_Helper.isForge && MMM_Helper.isClient) {
+			File lversions = new File(minecraftDir, "versions");
+			versionDir = new File(lversions, MMM_Client.getVersionString());
+			if (lversions.exists() && lversions.isDirectory() && versionDir.exists() && versionDir.isDirectory()) {
+				modDir = new File(versionDir, "/mods/");
+			} else {
+				modDir = new File(minecraftDir, "mods");
+			}
+		} else {
+			modDir = new File(minecraftDir, "mods");
+		}
+		mod_MMM_MMMLib.Debug("getMods-Directory:%s", modDir.getAbsolutePath());
+		
 		
 	}
 
@@ -92,20 +104,12 @@ public class MMM_FileManager {
 			fileList.put(pname, llist);
 		}
 		
-		// modsディレクトリの獲得
-		File lmod;
-		if (MMM_Helper.isClient) {
-			lmod = new File(MMM_Helper.mc.getMinecraftDir(), "/mods/");
-		} else {
-			lmod = MinecraftServer.getServer().getFile("mods/");
-		}
-		
-		mod_MMM_MMMLib.Debug("getModFile:[%s]:%s", pname, lmod.getAbsolutePath());
+		mod_MMM_MMMLib.Debug("getModFile:[%s]:%s", pname, modDir.getAbsolutePath());
 		// ファイル・ディレクトリを検索
 		try {
-			if (lmod.isDirectory()) {
-				mod_MMM_MMMLib.Debug("getModFile-get:%d.", lmod.list().length);
-				for (File t : lmod.listFiles()) {
+			if (modDir.isDirectory()) {
+				mod_MMM_MMMLib.Debug("getModFile-get:%d.", modDir.list().length);
+				for (File t : modDir.listFiles()) {
 					if (t.getName().indexOf(pprefix) != -1) {
 						if (t.getName().endsWith(".zip")) {
 							llist.add(t);

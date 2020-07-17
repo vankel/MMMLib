@@ -35,6 +35,7 @@ public interface MMM_IModelCaps {
 	public static final int caps_ticksExisted			= 0x0022;
 	public static final int caps_currentEquippedItem	= 0x0023;
 	public static final int caps_currentArmor			= 0x0024;
+	public static final int caps_healthFloat			= 0x0025;
 	
 	public static final int caps_isWet					= 0x0030;
 	public static final int caps_isDead					= 0x0031;
@@ -56,6 +57,11 @@ public interface MMM_IModelCaps {
 	public static final int caps_motionZ				= 0x0066;
 	public static final int caps_motion					= 0x0067;
 	public static final int caps_boundingBox			= 0x0068;
+	public static final int caps_rotationYaw			= 0x0069;
+	public static final int caps_rotationPitch			= 0x006a;
+	public static final int caps_prevRotationYaw		= 0x006b;
+	public static final int caps_prevRotationPitch		= 0x006c;
+	public static final int caps_renderYawOffset		= 0x006d;
 	
 	/** Entityの位置にオフセットした座標のBlockを取得する [0]:offsetX, [1]:offsetY, [2]:offsetZ **/
 //	public static final int caps_PosBlock				= 0x0080;
@@ -87,6 +93,7 @@ public interface MMM_IModelCaps {
 	public static final int caps_isBlocking			= 0x0106;
 	public static final int caps_isWait				= 0x0107;
 	public static final int caps_isWaitEX			= 0x0108;
+	/** インベントリを開いているかを返します(boolean) **/
 	public static final int caps_isOpenInv			= 0x0109;
 	public static final int caps_isWorking			= 0x010a;
 	public static final int caps_isWorkingDelay		= 0x010b;

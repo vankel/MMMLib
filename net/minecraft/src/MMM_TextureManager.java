@@ -24,6 +24,8 @@ import java.util.zip.ZipInputStream;
 
 import javax.swing.DebugGraphics;
 
+import org.bouncycastle.asn1.pkcs.Pfx;
+
 import net.minecraft.server.MinecraftServer;
 
 public class MMM_TextureManager {
@@ -121,9 +123,12 @@ public class MMM_TextureManager {
 		MMM_FileManager.getModFile("MMMLib", "ModelMulti");
 		addSearch("MMMLib", "/mob/ModelMulti/", "ModelMulti_");
 		addSearch("MMMLib", "/mob/littleMaid/", "ModelLittleMaid_");
+		addSearch("MMMLib", "/assets/minecraft/textures/entity/ModelMulti/", "ModelMulti_");
+		addSearch("MMMLib", "/assets/minecraft/textures/entity/littleMaid/", "ModelLittleMaid_");
 
 		MMM_FileManager.getModFile("littleMaidMob", "littleMaidMob");
 		addSearch("littleMaidMob", "/mob/littleMaid/", "ModelLittleMaid_");
+		addSearch("littleMaidMob", "/assets/minecraft/textures/entity/littleMaid/", "ModelLittleMaid_");
 	}
 
 	protected String[] getSearch(String pName) {
@@ -188,17 +193,11 @@ public class MMM_TextureManager {
 	protected void getArmorPrefix() {
 		// アーマーファイルのプリフィックスを獲得
 		try {
-			Field f = RenderPlayer.class.getDeclaredFields()[3];
-			f.setAccessible(true);
-			String[] s = (String[])f.get(null);
-			List<String> list = Arrays.asList(s);
-			armorFilenamePrefix = list.toArray(new String[0]);
-//			for (String t : armorFilenamePrefix) {
-//				mod_littleMaidMob.Debug("armor:".concat(t));
-//			}
+			armorFilenamePrefix = (String[])ModLoader.getPrivateValue(RenderBiped.class, null, 5);
 			return;
 		} catch (Exception e) {
 		} catch (Error e) {
+			e.printStackTrace();
 		}
 		armorFilenamePrefix = null;
 	}
@@ -217,13 +216,13 @@ public class MMM_TextureManager {
 			mod_MMM_MMMLib.Debug("getTexture-append-jar-file not founded.");
 		} else {
 			for (String[] lss : searchPrefix) {
-				mod_MMM_MMMLib.Debug("getTexture[%s].", lss[0]);
+				mod_MMM_MMMLib.Debug("getTexture[%s:%s].", lss[0], lss[1]);
 				addTexturesJar(MMM_FileManager.minecraftJar, lss);
 			}
 		}
 		
 		for (String[] lss : searchPrefix) {
-			mod_MMM_MMMLib.Debug("getTexture[%s].", lss[0]);
+			mod_MMM_MMMLib.Debug("getTexture[%s:%s].", lss[0], lss[1]);
 			// mods
 			for (File lf : MMM_FileManager.getFileList(lss[0])) {
 				for (String[] lst : searchPrefix) {
@@ -277,9 +276,9 @@ public class MMM_TextureManager {
 			}
 		}
 		mod_MMM_MMMLib.Debug("Loaded Texture Lists.(%d)", textures.size());
-//		for (MMM_TextureBox lbox : textures) {
-//			mod_MMM_MMMLib.Debug("texture: %s(%s) - hasModel:%b", lbox.textureName, lbox.fileName, lbox.models != null);
-//		}
+		for (MMM_TextureBox lbox : textures) {
+			mod_MMM_MMMLib.Debug("texture: %s(%s) - hasModel:%b", lbox.textureName, lbox.fileName, lbox.models != null);
+		}
 		for (int li = textures.size() - 1; li >= 0; li--) {
 			if (textures.get(li).models == null) {
 				textures.remove(li);
@@ -301,13 +300,11 @@ public class MMM_TextureManager {
 		MMM_TextureBox lbox = new MMM_TextureBox("Crafter_Steve", new String[] {"", "", ""});
 		lbox.fileName = "";
 		
-		lbox.textures.put(0x0c, "/mob/char.png");
+		lbox.addTexture(0x0c, "/assets/minecraft/textures/entity/steve.png");
 		if (armorFilenamePrefix != null && armorFilenamePrefix.length > 0) {
 			for (String ls : armorFilenamePrefix) {
-				Map<Integer, String> lmap = new HashMap<Integer, String>();
-				lbox.armors.put(ls, lmap);
-				lmap.put(tx_armor1, (new StringBuilder()).append("/armor/").append(ls).append("_2.png").toString());
-				lmap.put(tx_armor2, (new StringBuilder()).append("/armor/").append(ls).append("_1.png").toString());
+				lbox.addTexture(tx_armor1, (new StringBuilder()).append("/assets/minecraft/textures/models/armor/").append(ls).append("_2.png").toString());
+				lbox.addTexture(tx_armor2, (new StringBuilder()).append("/assets/minecraft/textures/models/armor/").append(ls).append("_1.png").toString());
 			}
 		}
 		
@@ -465,6 +462,8 @@ public class MMM_TextureManager {
 		// パッケージにテクスチャを登録
 		if (!fname.startsWith("/")) {
 			fname = (new StringBuilder()).append("/").append(fname).toString();
+		} else {
+			
 		}
 		
 		if (fname.startsWith(pSearch[1])) {
@@ -473,19 +472,19 @@ public class MMM_TextureManager {
 				String pn = fname.substring(pSearch[1].length(), i);
 				pn = pn.replace('/', '.');
 				String fn = fname.substring(i);
-				int j = getIndex(fn);
-				if (j > -1) {
+				int lindex = getIndex(fn);
+				if (lindex > -1) {
 					String an = null;
-					if (j == tx_oldarmor1) {
-						j = tx_armor1;
+					if (lindex == tx_oldarmor1) {
+						lindex = tx_armor1;
 						an = "default";
 					}
-					if (j == tx_oldarmor2) {
-						j = tx_armor2;
+					if (lindex == tx_oldarmor2) {
+						lindex = tx_armor2;
 						an = "default";
 					}
-					if (j == tx_oldwild) {
-						j = tx_wild + 12;
+					if (lindex == tx_oldwild) {
+						lindex = tx_wild + 12;
 					}
 					MMM_TextureBox lts = getTextureBox(pn);
 					if (lts == null) {
@@ -493,7 +492,9 @@ public class MMM_TextureManager {
 						textures.add(lts);
 						mod_MMM_MMMLib.Debug("getTextureName-append-texturePack-%s", pn);
 					}
-					if (j >= 0x40 && j <= 0x5f) {
+					lts.addTexture(lindex, fname);
+					/*
+					if (lindex >= 0x40 && lindex <= 0x5f) {
 						// ダメージドアーマー
 						Map<String, Map<Integer, String>> s = lts.armors;
 						if (an == null) an = fn.substring(1, fn.lastIndexOf('_'));
@@ -502,12 +503,13 @@ public class MMM_TextureManager {
 							ss = new HashMap<Integer, String>();
 							s.put(an, ss);
 						}
-						ss.put(j, fn);
+						ss.put(lindex, fn);
 					} else {
 						// 通常のテクスチャ
 						Map<Integer, String> s = lts.textures;
-						s.put(j, fn);
+						s.put(lindex, fn);
 					}
+					*/
 				}
 			}
 		}
@@ -561,16 +563,17 @@ public class MMM_TextureManager {
 		// 意味なし？
 		if (file.isDirectory()) {
 			mod_MMM_MMMLib.Debug("addTextureJar-file.");
+			boolean lflag = false;
 			
 			for (File t : file.listFiles()) {
-				if (t.isDirectory() && t.getName().equalsIgnoreCase("mob")) {
-//					if (addTexturesDir(file, pSearch)) {
-					if (addTexturesDir(t, pSearch)) {
-						mod_MMM_MMMLib.Debug("getTexture-append-jar-done.");
-					} else {
-						mod_MMM_MMMLib.Debug("getTexture-append-jar-fail.");
-					}
+				if (t.isDirectory()) {
+					lflag |= addTexturesDir(t, pSearch);
 				}
+			}
+			if (lflag) {
+				mod_MMM_MMMLib.Debug("getTexture-append-jar-done.");
+			} else {
+				mod_MMM_MMMLib.Debug("getTexture-append-jar-fail.");
 			}
 			
 			Package package1 = (net.minecraft.src.ModLoader.class).getPackage();
