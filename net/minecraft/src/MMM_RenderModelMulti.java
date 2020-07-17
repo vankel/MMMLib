@@ -50,20 +50,27 @@ public class MMM_RenderModelMulti extends RenderLiving {
 			double par4, double par6, float par8, float par9, MMM_IModelCaps pEntityCaps) {
 		if (par1EntityLiving instanceof MMM_ITextureEntity) {
 			MMM_ITextureEntity ltentity = (MMM_ITextureEntity)par1EntityLiving;
-			modelMain.model = ((MMM_TextureBox)ltentity.getTextureBox()[0]).models[0];
+			modelMain.model = ltentity.getTextureData().textureModel[0];
+			modelFATT.modelInner = ltentity.getTextureData().textureModel[1];
+			modelFATT.modelOuter = ltentity.getTextureData().textureModel[2];
+//			modelMain.model = ((MMM_TextureBox)ltentity.getTextureBox()[0]).models[0];
 			modelMain.textures = ltentity.getTextures(0);
-			modelFATT.modelInner = ((MMM_TextureBox)ltentity.getTextureBox()[1]).models[1];
-			modelFATT.modelOuter = ((MMM_TextureBox)ltentity.getTextureBox()[1]).models[2];
+//			modelFATT.modelInner = ((MMM_TextureBox)ltentity.getTextureBox()[1]).models[1];
+//			modelFATT.modelOuter = ((MMM_TextureBox)ltentity.getTextureBox()[1]).models[2];
 			modelFATT.textureInner = ltentity.getTextures(1);
 			modelFATT.textureOuter = ltentity.getTextures(2);
 			modelFATT.textureInnerLight = ltentity.getTextures(3);
 			modelFATT.textureOuterLight = ltentity.getTextures(4);
 		}
 		modelMain.setEntityCaps(pEntityCaps);
+		modelFATT.setEntityCaps(pEntityCaps);
 		modelMain.setRender(this);
+		modelFATT.setRender(this);
 		modelMain.showAllParts();
+		modelFATT.showAllParts();
 		modelMain.isAlphablend = true;
 		modelFATT.isAlphablend = true;
+		modelMain.lighting = modelFATT.lighting = par1EntityLiving.getBrightnessForRender(par8);
 		
 		modelMain.setCapsValue(MMM_IModelCaps.caps_heldItemLeft, (Integer)0);
 		modelMain.setCapsValue(MMM_IModelCaps.caps_heldItemRight, (Integer)0);
@@ -81,7 +88,7 @@ public class MMM_RenderModelMulti extends RenderLiving {
 	public void renderModelMulti(EntityLiving par1EntityLiving, double par2,
 			double par4, double par6, float par8, float par9, MMM_IModelCaps pEntityCaps) {
 		setModelValues(par1EntityLiving, par2, par4, par6, par8, par9, pEntityCaps);
-		// TODO:なぜか変なとこに飛んでループする
+		// TODO:1.6.2-MCP805 なぜか変なとこに飛んでループする
 //		super.func_130000_a(par1EntityLiving, par2, par4, par6, par8, par9);
 		super.doRenderLiving(par1EntityLiving, par2, par4, par6, par8, par9);
 	}
