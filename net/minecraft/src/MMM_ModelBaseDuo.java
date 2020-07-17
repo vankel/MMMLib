@@ -10,9 +10,8 @@ import org.lwjgl.opengl.GL11;
  * 必ずInner側にはモデルを設定すること。
  * 通常のRendererで描画するためのクラスなので、Renderをちゃんと記述するならいらないクラスです。
  */
-public class MMM_ModelBaseDuo extends ModelBase implements MMM_IModelBaseMMM {
+public class MMM_ModelBaseDuo extends MMM_ModelBaseNihil implements MMM_IModelBaseMMM {
 
-	public RenderLiving renderLiving;
 	public MMM_ModelMultiBase modelOuter;
 	public MMM_ModelMultiBase modelInner;
 	/**
@@ -30,11 +29,6 @@ public class MMM_ModelBaseDuo extends ModelBase implements MMM_IModelBaseMMM {
 	 * shouldRenderPassとかで指定する。
 	 */
 	public int renderParts;
-	public boolean isAlphablend;
-	public boolean isModelAlphablend;
-	public MMM_IModelBaseMMM capsLink;
-	protected MMM_IModelCaps entityCaps;
-	protected boolean isRendering;
 
 
 	public MMM_ModelBaseDuo(RenderLiving pRender) {
@@ -86,14 +80,9 @@ public class MMM_ModelBaseDuo extends ModelBase implements MMM_IModelBaseMMM {
 		isAlphablend = false;
 	}
 
-//	@Override
-//	public ModelRenderer getRandomModelBox(Random par1Random) {
-//		return modelArmorInner.getRandomModelBox(par1Random);
-//	}
-
 	@Override
 	public TextureOffset getTextureOffset(String par1Str) {
-		return modelInner.getTextureOffset(par1Str);
+		return modelInner == null ? null : modelInner.getTextureOffset(par1Str);
 	}
 
 	@Override
@@ -181,6 +170,7 @@ public class MMM_ModelBaseDuo extends ModelBase implements MMM_IModelBaseMMM {
 		return false;
 	}
 
+	@Override
 	public void showAllParts() {
 		if (modelInner != null) {
 			modelInner.showAllParts();

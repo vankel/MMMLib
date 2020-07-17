@@ -16,6 +16,7 @@
 - 要Modloader。
 - %appdata%/.mincraft/mods/にZIPのまま放りこんで下さい。
 - %appdata%/.mincraft/config/mod_MMM_MMMLib.cfgができるので設定はそちらで。
+- サーバー側で動作させた場合、クライアントで使用されたテクスチャパックのリストとして、%appdata%/.mincraft/config/mod_MMM_textureList.cfgが作成されます。
 
 
 ## 設定
@@ -23,7 +24,8 @@
   他MOD使用時にどうしても表示がおかしくなる場合はfalseにしてください。  
   但し、拙作のMODの一部で正しく表示が行われなくなります。
 - 「isDebugMessage」はMMMLibが出力するデバッグメッセージの設定をします。
-- 「startVehicleEntityID」は内部で使用される非生物系のEntityIDを獲得するときの先頭番号を指定します。
+- 「startVehicleEntityID」は内部で使用される非生物系のEntityIDを獲得するときの先頭番号を指定します。  
+  Forge環境下ではあまり意味はありません。
 
 
 ## 注意
@@ -31,6 +33,11 @@
 
 
 ## 変更点
+- 20130618.1 1.5.2 Rev6 更新
+    - モデル表示用のクラスとしてModelBaseSoloの追加。
+    - IModelCapsにパラメーターを追加。
+    - ドキュメントの一部をLMMから移動。
+    - AlphaBlendの設定をLMMから移動。
 - 20130611.1 1.5.2 Rev5 更新
     - EntityLiving用のEntityCapsを追加。
     - モデル選択GUIをこちらへ移動。
