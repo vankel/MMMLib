@@ -303,8 +303,10 @@ public class MMM_TextureManager {
 		lbox.addTexture(0x0c, "/assets/minecraft/textures/entity/steve.png");
 		if (armorFilenamePrefix != null && armorFilenamePrefix.length > 0) {
 			for (String ls : armorFilenamePrefix) {
-				lbox.addTexture(tx_armor1, (new StringBuilder()).append("/assets/minecraft/textures/models/armor/").append(ls).append("_2.png").toString());
-				lbox.addTexture(tx_armor2, (new StringBuilder()).append("/assets/minecraft/textures/models/armor/").append(ls).append("_1.png").toString());
+				Map<Integer, ResourceLocation> lmap = new HashMap<Integer, ResourceLocation>();
+				lmap.put(tx_armor1, new ResourceLocation((new StringBuilder()).append("textures/models/armor/").append(ls).append("_layer_2.png").toString()));
+				lmap.put(tx_armor2, new ResourceLocation((new StringBuilder()).append("textures/models/armor/").append(ls).append("_layer_1.png").toString()));
+				lbox.armors.put(ls, lmap);
 			}
 		}
 		
@@ -493,23 +495,6 @@ public class MMM_TextureManager {
 						mod_MMM_MMMLib.Debug("getTextureName-append-texturePack-%s", pn);
 					}
 					lts.addTexture(lindex, fname);
-					/*
-					if (lindex >= 0x40 && lindex <= 0x5f) {
-						// ダメージドアーマー
-						Map<String, Map<Integer, String>> s = lts.armors;
-						if (an == null) an = fn.substring(1, fn.lastIndexOf('_'));
-						Map<Integer, String> ss = s.get(an);
-						if (ss == null) {
-							ss = new HashMap<Integer, String>();
-							s.put(an, ss);
-						}
-						ss.put(lindex, fn);
-					} else {
-						// 通常のテクスチャ
-						Map<Integer, String> s = lts.textures;
-						s.put(lindex, fn);
-					}
-					*/
 				}
 			}
 		}
